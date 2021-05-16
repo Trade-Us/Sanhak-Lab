@@ -92,6 +92,7 @@ def graphCluster():
         figs.append(makeGraph_Cluster(GG[i], 'teal'))
         updateLayout(figs[i], 'cluster'+str(i))
     graph = html.Div(style={ }, children=[
+        html.H4("각 군집 모임"),
         html.Div(
             [html.Div(
                 dcc.Graph(id=f'GC{i}', figure=fig), 
@@ -133,7 +134,6 @@ def graphBig(nth_cluster, num_graph):
                     id='GB1',
                     figure=fig[0]
                 )]),
-
             ]
         )
     ])

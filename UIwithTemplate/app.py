@@ -19,6 +19,7 @@ from text_data import textResultDiv
 from result_graph import graphDetail, graphCluster, graphBig
 from result_graph import GG
 import show_detail as sd
+from visualization import pca_show
 
 app = dash.Dash(
     __name__,
@@ -115,12 +116,19 @@ app.layout = html.Div(
                         ),
                         # 군집화 결과 그래프 컴포넌트
                         html.Div([
+                            html.Div([html.H3("군집화 REPORT")], className='textTitle'),
+                            html.Hr(),
                             html.Div([
-                                textResultDiv()
-                            ]),
+                                html.Div([
+                                    textResultDiv()
+                                ], className='text-pca'),
+                                html.Div([
+                                    pca_show()
+                                ], className='text-pca')
+                            ], className='row container-display'),
                             html.Div([
                                 graphCluster()
-                            ], className = 'box-scroll')
+                            ], className = 'box-scroll ')
                         ],
                             id="countGraphContainer",
                             className="pretty_container",

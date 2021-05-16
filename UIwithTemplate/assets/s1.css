@@ -764,3 +764,25 @@ there.
   text-align: left;
 }
 
+/* 군집화 REPORT */
+
+.textTitle{
+  text-align: center;
+}
+
+.circle{
+  background-color: white;
+  border-radius: 50%;
+  height: 450px;
+  text-align: center; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 50%;
+}
+
+.text-pca{
+  display: inline-block;
+  padding: 10px;
+  width: 46%;
+}
