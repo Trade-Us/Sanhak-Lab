@@ -116,7 +116,7 @@ app.layout = html.Div(
                         ),
                         # 군집화 결과 그래프 컴포넌트
                         html.Div([
-                            html.Div([html.H3("군집화 REPORT")], className='textTitle'),
+                            html.Div([html.Div("CLUSTERING REPORT")], className='textTitle'),
                             html.Hr(),
                             html.Div([
                                 html.Div([
@@ -125,10 +125,10 @@ app.layout = html.Div(
                                 html.Div([
                                     pca_show()
                                 ], className='text-pca')
-                            ], className='row container-display'),
+                            ], className='row container-display subtitle'),
                             html.Div([
                                 graphCluster()
-                            ], className = 'box-scroll ')
+                            ], className = 'box-scroll subtitle')
                         ],
                             id="countGraphContainer",
                             className="pretty_container",

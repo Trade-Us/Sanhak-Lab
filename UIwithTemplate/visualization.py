@@ -89,7 +89,7 @@ fig.add_trace(go.Scatter(
 
 def pca_show():
     graph = html.Div(style={}, children=[
-        html.H4("군집 2차원 시각화"),
+        html.Div("2-DIM VISUALIZATION"),
         html.Div(
             [html.Div(
                 dcc.Graph(id='pca_show', figure=fig))

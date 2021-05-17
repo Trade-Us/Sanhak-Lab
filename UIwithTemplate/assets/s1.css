@@ -36,6 +36,7 @@
 
 /* Grid
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
 .container {
   position: relative;
   width: 100%;
@@ -92,7 +93,7 @@
     width: 96%;
   }
   .eight.columns {
-    width: 70.3333333333%;
+    width: 73.3333333333%;
   }
   .nine.columns {
     width: 74%;
@@ -625,9 +626,8 @@ there.
     display: inline-block;
     width:30%;
     padding: 10px;
-
-  
 }
+
 .graph-hover:hover{
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
@@ -768,17 +768,24 @@ there.
 
 .textTitle{
   text-align: center;
+  color: #7c795d; 
+  font-family: 'Trocchi', serif; 
+  font-size: 40px; 
+  font-weight: bold; 
+  margin: 0;
+}
+
+.subtitle{
+  font-family: 'Trocchi', serif; 
+  font-size: 20px; 
+  margin: 0;
 }
 
 .circle{
   background-color: white;
   border-radius: 50%;
   height: 450px;
-  text-align: center; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 50%;
+  /* text-align: center;  */
 }
 
 .text-pca{
