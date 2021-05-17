@@ -1,11 +1,5 @@
 # Clustering Algorithm
-from sklearn.cluster import DBSCAN
-from sklearn.cluster import KMeans
-from sklearn.cluster import SpectralClustering, AgglomerativeClustering
-
-# Normalization
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import DBSCAN, KMeans, SpectralClustering, AgglomerativeClustering
 
 # Needed Library!
 import pandas as pd
