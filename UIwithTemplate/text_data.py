@@ -11,6 +11,12 @@ def textResultDiv():
     time = "30"
     used_algo = "DTW"   
     textdata = html.Div(children=[
-        html.H5(children='* 군집 개수 : '+cluster_num+'  군집별 데이터 개수 : '+data_num+'  총 소요 시간 : '+time+'  사용된 알고리즘 : '+used_algo),
+        html.Div("SUMMARIZATION"),
+        html.Div([
+        html.Div(children='군집 개수 : '+cluster_num),
+        html.Div(children='군집별 데이터 개수 : '+data_num),
+        html.Div(children='총 소요 시간 : '+time),
+        html.Div(children='사용된 알고리즘 : '+used_algo)
+        ], className='circle')
     ])
     return textdata
