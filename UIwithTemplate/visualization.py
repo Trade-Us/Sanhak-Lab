@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from readFile import split_into_values, toRPdata
+from readFile import split_into_values
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance, TimeSeriesResampler
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
