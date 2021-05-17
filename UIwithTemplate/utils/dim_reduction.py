@@ -5,8 +5,8 @@ import pywt
 import numpy as np
 
 ## tslearn resampling
-def exec_ts_resampler():
-    data = TimeSeriesResampler(sz=size).fit_transform(X_ts)
+def exec_ts_resampler(X, size):
+    data = TimeSeriesResampler(sz=size).fit_transform(X)
     return data
 
 ## Autoeocoder

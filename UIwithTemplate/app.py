@@ -1,10 +1,3 @@
-# Import required libraries
-# import pickle
-# import copy
-# import pathlib
-# import urllib.request
-# import math
-# import datetime as dt
 import dash
 from dash.dependencies import Input, Output, State, ClientsideFunction
 import dash_core_components as dcc
@@ -94,6 +87,15 @@ app.layout = html.Div(
                                     {'label': 'RP + Autoencoder + Kmeans', 'value':'rp_ae_kmeans'},
                                     {'label': 'RP + Autoencoder + Hierarchical Cluster', 'value':'rp_ae_hierarchy'},
                                     {'label': 'RP + Autoencoder + DBSCAN', 'value':'rp_ae_dbscan'},
+                                    {'label': 'GAF + Autoencoder + Kmeans', 'value':'gaf_ae_kmeans'},
+                                    {'label': 'GAF + Autoencoder + Hierarchical Cluster', 'value':'gaf_ae_hierarchy'},
+                                    {'label': 'GAF + Autoencoder + DBSCAN', 'value':'gaf_ae_dbscan'},
+                                    {'label': 'MTF + Autoencoder + Kmeans', 'value':'mtf_ae_kmeans'},
+                                    {'label': 'MTF + Autoencoder + Hierarchical Cluster', 'value':'mtf_ae_hierarchy'},
+                                    {'label': 'MTF + Autoencoder + DBSCAN', 'value':'mtf_ae_dbscan'},
+                                    {'label': 'Wavelet + Kmeans', 'value':'wavelet_kmeans'},
+                                    {'label': 'Wavelet + Hierarchical Cluster', 'value':'wavelet_hierarchy'},
+                                    {'label': 'Wavelet + DBSCAN', 'value':'wavelet_dbscan'},
                                 ],
                         value='ts_sample_kmeans'),
                     html.Div(id='parameter-layout')],
@@ -213,12 +215,32 @@ def select_main_algorithm(algorithm):
         return ts_sample_kmeans()
     elif algorithm == 'ts_sample_hierarchy':
         return ts_sample_hierarchy()
+    elif algorithm == 'ts_sample_ts_kmeans':
+        return ts_sample_ts_kmeans()
     elif algorithm == 'rp_ae_kmeans':
         return rp_ae_kmeans()
     elif algorithm == 'rp_ae_hierarchy':
         return rp_ae_hierarchy()
     elif algorithm == 'rp_ae_dbscan':
         return rp_ae_dbscan()
+    elif algorithm == 'gaf_ae_kmeans':
+        return gaf_ae_kmeans()
+    elif algorithm == 'gaf_ae_hierarchy':
+        return gaf_ae_hierarchy()
+    elif algorithm == 'gaf_ae_dbscan':
+        return gaf_ae_dbscan()
+    elif algorithm == 'mtf_ae_kmeans':
+        return mtf_ae_kmeans()
+    elif algorithm == 'mtf_ae_hierarchy':
+        return mtf_ae_hierarchy()
+    elif algorithm == 'mtf_ae_dbscan':
+        return mtf_ae_dbscan()
+    elif algorithm == 'wavelet_kmeans':
+        return wavelet_kmeans()
+    elif algorithm == 'wavelet_hierarchy':
+        return wavelet_hierarchy()
+    elif algorithm == 'wavelet_dbscan':
+        return wavelet_dbscan()
 #######################################################################
 #  각 알고리즘 별 변수 저장
 # KMeans 관련 parameter
@@ -265,16 +287,45 @@ def store_dbscan_param(eps, msp):
     df['min_sample'] = [msp]
     data = df.to_dict('records')
     return data
+
 # Image Data(RP) 관련 Parameter
 @app.callback(
+    Output('store-gaf-param', 'data'),
+    Input("image-size", "value"),
+    Input("gaf-method", "value")
+)
+def store_gaf_param(img_size, method):
+    df = pd.DataFrame()
+    df['image_size'] = [img_size]
+    df['gaf_method'] = [method]
+    data = df.to_dict('records')
+    return data
+
+@app.callback(
+    Output('store-mtf-param', 'data'),
+    Input("image-size", "value"),
+    Input("mtf-n-bins", "value"),
+    Input("mtf-strategy", "value"),
+)
+def store_mtf_param(img_size, n_bins, strategy):
+    df = pd.DataFrame()
+    df['image_size'] = [img_size]
+    df['n_bins'] = [n_bins]
+    df['mtf_strategy'] = [strategy]
+    data = df.to_dict('records')
+    return data
+
+@app.callback(
     Output('store-rp-param', 'data'),
+    Input("image-size", "value"),
     Input("dimension", "value"),
     Input("time-delay", "value"),
     Input("threshold", "value"),
     Input("percentage", "value"),
 )
-def store_rp_param(dim, td, th, prtg):
+def store_rp_param(img_size, dim, td, th, prtg):
     df = pd.DataFrame()
+    df['image_size'] = [img_size]
     df['dimension'] = [dim]
     df['time_delay'] = [td]
     df['threshold'] = [th]
@@ -282,7 +333,6 @@ def store_rp_param(dim, td, th, prtg):
     data = df.to_dict('records')
     return data
 
-# Autoencoder (ae) 관련 Parameter
 @app.callback(
     Output('store-autoencoder-param', 'data'),
     Input("autoencoder-batch-size", "value"),
@@ -296,6 +346,37 @@ def store_ae_param(bs, lr, loss_f, act_f):
     df['learning_rate'] = [lr]
     df['loss_function'] = [loss_f]
     df['activation_function'] = [act_f]
+    data = df.to_dict('records')
+    return data
+
+@app.callback(
+    Output('store-wavelet-param', 'data'),
+    Input("wavelet-function", "value"),
+    Input("iteration-make-half-dim", "value")
+)
+def store_wavelet_param(func, iter):
+    df = pd.DataFrame()
+    df['wavelet_func'] = [func]
+    df['iter_to_half'] = [iter]
+    data = df.to_dict('records')
+    return data
+# Autoencoder (ae) 관련 Parameter
+@app.callback(
+    Output('store-ts-resampler-param', 'data'),
+    Input("ts-resampler-dim", "value")
+)
+def store_ts_resampler_param(dim):
+    df = pd.DataFrame()
+    df['dimension'] = [dim]
+    data = df.to_dict('records')
+    return data
+@app.callback(
+    Output('store-normalization-param', 'data'),
+    Input('normalization-method', 'value'),
+)
+def store_normalization_param(method):
+    df = pd.DataFrame()
+    df['normalization'] = [method]
     data = df.to_dict('records')
     return data
 #######################################################################
@@ -362,51 +443,128 @@ def exct_rp_autoencoder_dbscan(n_clicks, rp_data, ae_data, dbs_data):
     print(ae_data)
     print(dbs_data)
     return []
-#######################################################
-# import numpy as np
-# from readFile import split_into_values, toRPdata
-# from tslearn.preprocessing import TimeSeriesScalerMeanVariance, TimeSeriesResampler
-# from sklearn.preprocessing import MinMaxScaler
-# from utils import split_data, normalization_tool
-# from agent import Autoencoder_Agent
-# def MinMax(data):
-#     MMS = MinMaxScaler().fit(data)
-#     scaled = MMS.transform(data)
-#     return scaled
-# RP -> CNN -> KMenas알고리즘 적용
 
-# df = pd.read_csv('../resources/testdata.csv')
-# columns = ['chip', 'wire', 'segment']
-# value = ['value']
-# #df = pd.read_csv('resources/Dataset1.csv')
-# #columns = ['Process', 'Step']
-# #value = ['Value']
+# gaf-ae-kmeans
+@app.callback(
+    Output("hidden-gaf-ae-kmeans", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-gaf-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-kmeans-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_gaf_autoencoder_kmeans(n_clicks, gaf_data, ae_data, km_data):
+    print(gaf_data)
+    print(ae_data)
+    print(km_data)
+    return []
+# gaf-ae-hierarchy
+@app.callback(
+    Output("hidden-gaf-ae-hierarchy", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-gaf-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-hierarchy-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_gaf_autoencoder_hierarchy(n_clicks, gaf_data, ae_data, hrc_data):
+    print(gaf_data)
+    print(ae_data)
+    print(hrc_data)
+    return []
+# gaf-ae-dbscan
+@app.callback(
+    Output("hidden-gaf-ae-dbscan", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-gaf-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-dbscan-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_gaf_autoencoder_dbscan(n_clicks, gaf_data, ae_data, dbs_data):
+    print(gaf_data)
+    print(ae_data)
+    print(dbs_data)
+    return []
 
-# df = df.loc[:, columns + value] #('chip', 'wire', 'value')는 사용자 입력
-# size = 28
-# result = split_into_values(df, columns)
-# result_ = TimeSeriesResampler(sz=size).fit_transform(result)
-# data = result_.reshape(result_.shape[0], 1, size)
-# if cnn_data[0]['before-autoencoder-img-data-type'] == 'RP':
-#     X = toRPdata(data)
-#     X_scaled = np.empty((X.shape[0], size, size))
-#     for i, data in enumerate(X):
-#         X_scaled[i] = MinMax(data)
-#     X_scaled = np.expand_dims(X_scaled, axis=3)
-# if ma_data[0]['main_algorithm'] == 'CNAE':    
-#     batch_size = cnn_data[0]['batch_size']
-#     learning_rate = 0.01
-#     #learning_rate = cnn_data[0]['learning_rate']
-#     epochs = 5
-#     optimizer='Adam'
-#     loss='binary_crossentropy'
-#     X_train, X_test, Y_train, Y_test = split_data(X_scaled, X_scaled) #데이터 분리
-
-#     agent_28 = Autoencoder_Agent(28,optimizer,learning_rate)
-#     agent_28.train(X_train,batch_size,epochs,X_test)
-#     feature = agent_28.feature_extract(X_train)
-#     print(feature)
-
+# mtf-ae-kmeans
+@app.callback(
+    Output("hidden-mtf-ae-kmeans", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-mtf-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-kmeans-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_mtf_autoencoder_kmeans(n_clicks, mtf_data, ae_data, km_data):
+    print(mtf_data)
+    print(ae_data)
+    print(km_data)
+    return []
+# mtf-ae-hierarchy
+@app.callback(
+    Output("hidden-mtf-ae-hierarchy", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-mtf-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-hierarchy-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_mtf_autoencoder_hierarchy(n_clicks, mtf_data, ae_data, hrc_data):
+    print(mtf_data)
+    print(ae_data)
+    print(hrc_data)
+    return []
+# mtf-ae-dbscan
+@app.callback(
+    Output("hidden-mtf-ae-dbscan", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-mtf-param", 'data'),
+    State("store-autoencoder-param", 'data'),
+    State("store-dbscan-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_mtf_autoencoder_dbscan(n_clicks, mtf_data, ae_data, dbs_data):
+    print(mtf_data)
+    print(ae_data)
+    print(dbs_data)
+    return []
+# wavelet-kmeans
+@app.callback(
+    Output("hidden-wavelet-kmeans", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-wavelet-param", 'data'),
+    State("store-kmeans-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_wavelet_kmeans(n_clicks, wav_data, kms_data):
+    print(wav_data)
+    print(kms_data)
+    return []
+# wavelet-hierarchy
+@app.callback(
+    Output("hidden-wavelet-hierarchy", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-wavelet-param", 'data'),
+    State("store-hierarchy-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_wavelet_hierarchy(n_clicks, wav_data, hrc_data):
+    print(wav_data)
+    print(hrc_data)
+    return []
+# wavelet-dbscan
+@app.callback(
+    Output("hidden-wavelet-dbscan", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-wavelet-param", 'data'),
+    State("store-dbscan-param", 'data'),
+    prevent_initial_call=True 
+)
+def exct_wavelet_dbscan(n_clicks, wav_data, dbs_data):
+    print(wav_data)
+    print(dbs_data)
+    return []
 # 학습 버튼을 클릭 하게 되면, i
 # Main
 if __name__ == "__main__":
