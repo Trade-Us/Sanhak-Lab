@@ -18,8 +18,8 @@ from clusters import *
 from read_csv import csvDiv, parse_contents
 from result_graph import graphDetail, graphCluster, graphBig, textResultDiv
 import show_detail as sd
-import numpy as np
-# from visualization import pca_show
+
+from visualization import pca_show
 
 app = dash.Dash(
     __name__,
@@ -115,10 +115,11 @@ app.layout = html.Div(
                     dcc.Dropdown(
                         id='main-ts-data'
                     ),
+                    html.Hr(),
                     html.Div(id='normalization-param', children=[
                     dcc.Store(id='store-normalization-param', data=[]),
-                    html.H5("normalization Parameters"),
-                    html.Label('normalization method Before Training'),
+                    html.H4("Normalization Parameters"),
+                    html.H6('Normalization method Before Training'),
                     dcc.Dropdown(id='normalization-method',
                         options=[
                             {'label': 'MinMax Scaler', 'value':'MMS'},

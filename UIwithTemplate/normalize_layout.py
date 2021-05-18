@@ -6,7 +6,7 @@ def normalization_layout():
     return html.Div(id='normalization-param', children=[
         dcc.Store(id='store-normalization-param', data=[]),
         html.H4("normalization Parameters"),
-        html.Label('normalization method Before Training'),
+        html.H6('normalization method Before Training'),
         dcc.Dropdown(id='normalization-method',
             options=[
                 {'label': 'MinMax Scaler', 'value':'MMS'},
