@@ -21,10 +21,10 @@ def rp_layout():
         html.Label("궤적의 거리 최솟값을 설정한다."),
         dcc.Dropdown(id='threshold',
         options=[
-            {'label': 'float', 'value':'F'},
-            {'label': 'point', 'value':'P'},
-            {'label': 'distance', 'value':'D'},
-            {'label': 'None', 'value' : 'N'}
+            {'label': 'float', 'value':'float'},
+            {'label': 'point', 'value':'point'},
+            {'label': 'distance', 'value':'distance'},
+            {'label': 'None', 'value' : 'None'}
         ], value='F'),
         html.Label("percentage if point or distance"),
         dcc.Slider(id='percentage', min=10, max=60, marks={i: '{}'.format(i) for i in range(10, 61, 10)}, value=1, step=1),

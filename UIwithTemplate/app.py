@@ -373,13 +373,19 @@ def store_rp_param(img_size, dim, td, th, prtg):
     Input("autoencoder-learning-rate", "value"),
     Input("autoencoder-loss-function", "value"),
     Input("autoencoder-activation-function", "value"),
+    Input("autoencoder-epoch", "value"),
+    Input("autoencoder-optimizer", "value"),
+    Input("autoencoder-dimension-feautre", "value"),
 )
-def store_ae_param(bs, lr, loss_f, act_f):
+def store_ae_param(bs, lr, loss_f, act_f, epoch, optm, dim):
     df = pd.DataFrame()
     df['batch_size'] = [bs]
     df['learning_rate'] = [lr]
     df['loss_function'] = [loss_f]
     df['activation_function'] = [act_f]
+    df['epoch'] = [epoch]
+    df['optimizer'] = [optm]
+    df['dimension_feature'] = [dim]
     data = df.to_dict('records')
     return data
 
@@ -442,7 +448,7 @@ def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
     result_ = result_.reshape(result_.shape[0],min_len)
     print(result_.shape)
 
-    result = kmeans(result_,km_data[0]['number_of_cluster'] ,float(km_data[0]['tolerance']),km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
+    result = kmeans(result_,km_data[0]['number_of_cluster'] , km_data[0]['tolerance'],km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
 
     print(result.labels_)
     return []
@@ -487,12 +493,12 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     #(242,28,1)
     result_ = result_.reshape(result_.shape[0],1,result_.shape[1])
     #(242,28,28)
-    X = toRPdata(result_,rp_data[0]['dimension'],rp_data[0]['time_delay'],None,rp_data[0]['percentage'])
+    X = toRPdata(result_,rp_data[0]['dimension'],rp_data[0]['time_delay'],rp_data[0]['threshold'],rp_data[0]['percentage'] / 100)
     X_expand = np.expand_dims(X,axis=3)
     print(X_expand.shape)
-    all_feature = fit_autoencoder(X_expand,rp_data[0]['image_size'],32,'Adam',3e-5,ae_data[0]['activation_function'],'binary_crossentropy',ae_data[0]['batch_size'],5)
+    all_feature = fit_autoencoder(X_expand,rp_data[0]['image_size'],ae_data[0]['dimension_feature'],ae_data[0]['optimizer'],(3e-7) * (10**ae_data[0]['learning_rate']),ae_data[0]['activation_function'],ae_data[0]['loss_function'],ae_data[0]['batch_size'],ae_data[0]['epoch'])
     print(all_feature.shape)
-    result = kmeans(all_feature,km_data[0]['number_of_cluster'] ,float(km_data[0]['tolerance']),km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
+    result = kmeans(all_feature, km_data[0]['number_of_cluster'] , km_data[0]['tolerance'], km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
 
     return []
 # rp-ae-hierarchy

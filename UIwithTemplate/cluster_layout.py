@@ -12,8 +12,10 @@ def kmeans_layout():
         html.Label('Tolerance, default = 1e-4'),
         dcc.RadioItems(id='tolerance', 
             options=[
-                {'label': '1e-4', 'value': 'O_F'},
-            ], value='1e-4'),
+                {'label': '1e-4', 'value': 1e-3},
+                {'label': '1e-4', 'value': 1e-4},
+                {'label': '1e-4', 'value': 1e-5},
+            ], value=1e-4),
         html.Label('KMeans를 시도해볼 횟수'),
         dcc.Input(id='try-n-init', min=1, value=10, type='number'),
         html.Label('Kmeans가 알고리즘 안에 반복되는 최대 횟수'),

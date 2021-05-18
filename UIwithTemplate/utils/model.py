@@ -7,7 +7,18 @@ from keras.layers.convolutional import Conv2D, MaxPooling2D, UpSampling2D
 from keras import backend as K
 from utils.optimizer import *
 
-def CNNAutoEncoder_28(optimizer,learning_rate,activation='sigmoid', loss='mse'):
+def CNNAutoEncoder_28(optimizer,dimension, learning_rate, activation='sigmoid', loss='mse'):
+    filter_size = 0
+    channel = 0
+    if dimension == 4:
+        filter_size = 7; channel = 1
+    elif dimension == 8:
+        filter_size = 7; channel = 2
+    elif dimension == 16:
+        filter_size = 7; channel = 4
+    elif dimension == 32:
+        filter_size = 7; channel = 8
+
     optimizer = optimizer_set(optimizer, learning_rate)
     model = Sequential()
  
@@ -18,16 +29,16 @@ def CNNAutoEncoder_28(optimizer,learning_rate,activation='sigmoid', loss='mse'):
     model.add(MaxPooling2D(pool_size=(2,2), padding='same'))
 
     #2nd convolution layer
-    model.add(Conv2D(2,(3, 3), padding='same')) # apply 2 filters sized of (3x3)
+    model.add(Conv2D(channel,(3, 3), padding='same')) # apply 2 filters sized of (3x3)
     model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2,2), padding='same'))
+    model.add(MaxPooling2D(pool_size=(filter_size,filter_size), padding='same'))
 
     #here compressed version
 
     #3rd convolution layer
-    model.add(Conv2D(2,(3, 3), padding='same')) # apply 2 filters sized of (3x3)
+    model.add(Conv2D(channel,(3, 3), padding='same')) # apply 2 filters sized of (3x3)
     model.add(Activation('relu'))
-    model.add(UpSampling2D((2, 2)))
+    model.add(UpSampling2D((filter_size, filter_size)))
 
     #4rd convolution layer
     model.add(Conv2D(16,(3, 3), padding='same'))
@@ -35,7 +46,7 @@ def CNNAutoEncoder_28(optimizer,learning_rate,activation='sigmoid', loss='mse'):
     model.add(UpSampling2D((2, 2)))
 
     model.add(Conv2D(1,(3, 3), padding='same'))
-    model.add(Activation('sigmoid'))
+    model.add(Activation(activation))
     model.summary()
     
     
