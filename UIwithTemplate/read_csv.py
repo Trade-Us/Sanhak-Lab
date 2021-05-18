@@ -40,7 +40,7 @@ def parse_contents(contents, filename, date):
             # Assume that the user uploaded a CSV file
             df = pd.read_csv(
                 io.StringIO(decoded.decode('utf-8')))
-            df.to_csv('C:\\Users\\rqt92\\Documents\\GitHub\\unlabeld-tsdata-clustering\\resources\\'+filename,sep=',',na_rep='NaN')
+            df.to_csv('.\\data\\'+filename,sep=',',na_rep='NaN')
         elif 'xls' in filename:
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded))
@@ -49,15 +49,4 @@ def parse_contents(contents, filename, date):
         return html.Div([
             'There was an error processing this file.'
         ])
-
-    return html.Div([
-        html.H5(filename),
-        #html.Hr(),  # horizontal line
-
-        # For debugging, display the raw contents provided by the web browser
-        html.Div('Raw Content'),
-        html.Pre(contents[0:100] + '...', style={
-            'whiteSpace': 'pre-wrap',
-            'wordBreak': 'break-all'
-        })
-    ])
+    return ( html.Div([ html.H5(filename),]) , [{'label' : f'{col}', 'value' : f'{col}'} for col in df.columns])

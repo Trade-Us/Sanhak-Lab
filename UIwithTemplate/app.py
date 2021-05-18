@@ -12,7 +12,7 @@ from text_data import textResultDiv
 from result_graph import graphDetail, graphCluster, graphBig
 from result_graph import GG
 import show_detail as sd
-from visualization import pca_show
+# from visualization import pca_show
 
 app = dash.Dash(
     __name__,
@@ -98,6 +98,29 @@ app.layout = html.Div(
                                     {'label': 'Wavelet + DBSCAN', 'value':'wavelet_dbscan'},
                                 ],
                         value='ts_sample_kmeans'),
+                    html.Div(id='hidden-columns', style={'display':'none'}),
+                    html.Label('시계열 데이터 셋을 구분하는 column을 설정해주세요. (1개 이상)'),
+                    dcc.Dropdown(
+                        id='partitioning-column-data',
+                        multi=True
+                    ),
+                    html.Label('데이터의 값을 나타내는 column을 설정해주세요. (1개)'),
+                    dcc.Dropdown(
+                        id='main-ts-data'
+                    ),
+                    html.Div(id='normalization-param', children=[
+                    dcc.Store(id='store-normalization-param', data=[]),
+                    html.H5("normalization Parameters"),
+                    html.Label('normalization method Before Training'),
+                    dcc.Dropdown(id='normalization-method',
+                        options=[
+                            {'label': 'MinMax Scaler', 'value':'MMS'},
+                            {'label': 'Standard Scaler', 'value':'SSC'},
+                            {'label': 'Robust Scaler', 'value':'RBS'},
+                            {'label': 'Max Abs Scaler', 'value':'MAS'},
+                            {'label': 'Time Series Scaler Mean Variance', 'value':'TSS'}
+                        ], value='MMS'),
+                ]),
                     html.Div(id='parameter-layout')],
                     className="pretty_container four columns",
                     id="cross-filter-options",
@@ -125,7 +148,7 @@ app.layout = html.Div(
                                     textResultDiv()
                                 ], className='text-pca'),
                                 html.Div([
-                                    pca_show()
+                                    # pca_show()
                                 ], className='text-pca')
                             ], className='row container-display subtitle'),
                             html.Div([
@@ -164,15 +187,19 @@ app.layout = html.Div(
 
 ##read_csv
 @app.callback(Output('output-data-upload', 'children'),
+              Output('partitioning-column-data', 'options'),
+              Output('main-ts-data', 'options'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
-              State('upload-data', 'last_modified'))
+              State('upload-data', 'last_modified'),
+              prevent_initial_call=True 
+)
 def update_output(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
-        children = [
+        result = [
             parse_contents(c, n, d) for c, n, d in
             zip(list_of_contents, list_of_names, list_of_dates)]
-        return children
+        return result[0][0], result[0][1], result[0][1]
 
 ####                                                           ####
 # 컨트롤 컴포넌트에 의해 세부적 그래프 컴포넌트가 달라집니다. #
@@ -386,10 +413,16 @@ def store_normalization_param(method):
     Output("hidden-ts-sample-kmeans", "children"),
     Input("learn-button", "n_clicks"),
     State("store-kmeans-param", 'data'),
+    State("partitioning-column-data", 'value'),
+    State('main-ts-data', 'value'),
+    State('normalization-method', 'value'),
     prevent_initial_call=True 
 )
-def exct_ts_sample_kmeans(n_clicks, km_data):
+def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
     print(km_data)
+    print(parti_columns)
+    print(value)
+    print(normalize)
     return []
 # timeSeriesSample + hierarchy
 @app.callback(
@@ -398,7 +431,7 @@ def exct_ts_sample_kmeans(n_clicks, km_data):
     State("store-hierarchy-param", 'data'),
     prevent_initial_call=True 
 )
-def exct_ts_sample_kmeans(n_clicks, hrc_data):
+def exct_ts_sample_hierarchy(n_clicks, hrc_data):
     print(hrc_data)
     return []
 # rp-ae-kmeans
@@ -408,12 +441,18 @@ def exct_ts_sample_kmeans(n_clicks, hrc_data):
     State("store-rp-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-kmeans-param", 'data'),
+    State("partitioning-column-data", 'value'),
+    State('main-ts-data', 'value'),
+    State('normalization-method', 'value'),
     prevent_initial_call=True 
 )
-def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data):
+def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_columns, value, normalize):
     print(rp_data)
     print(ae_data)
     print(km_data)
+    print(parti_columns)
+    print(value)
+    print(normalize)
     return []
 # rp-ae-hierarchy
 @app.callback(
