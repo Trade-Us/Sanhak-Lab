@@ -1,5 +1,6 @@
 # 평가 지표 함수 
-
+import numpy as np
+from sklearn.metrics import silhouette_score
 # Accuracy를 가져오는 함수
 # data_y: 정답 데이터
 # pred_y: 예측 데이터
@@ -10,3 +11,7 @@ def getAccuracy(data_y, pred_y):
         if(correct):
             count += 1
     return count / pred_y.size
+
+def plotSilhouette(X, y_km):
+    silhouette_vals = silhouette_score(X, y_km.labels_,metric='euclidean')
+    return silhouette_vals

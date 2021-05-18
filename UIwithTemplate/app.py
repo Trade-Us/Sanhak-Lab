@@ -13,12 +13,12 @@ from utils.dim_reduction import exec_ts_resampler, fit_autoencoder
 from utils.normalize import MinMax, Standard,Robust,MaxAbsScaler,tsleanr_scaler
 from utils.clustering import *
 from utils.imagination import *
+from utils.metric import *
 from clusters import *
 from read_csv import csvDiv, parse_contents
-from text_data import textResultDiv
-from result_graph import graphDetail, graphCluster, graphBig
-from result_graph import GG
+from result_graph import graphDetail, graphCluster, graphBig, textResultDiv
 import show_detail as sd
+import numpy as np
 # from visualization import pca_show
 
 app = dash.Dash(
@@ -234,10 +234,10 @@ def update_parameter( nth_cluster, detail_graph, num_graph):
     if num_graph is None or num_graph > nMaxGraphs:
         num_graph = nMaxGraphs
     if detail_graph == 'GrDt':
-        layout = graphDetail(nth_cluster, num_graph)
+        layout = graphDetail(nth_cluster, num_graph, GG)
         clsName = "box-scroll"
     elif detail_graph == 'GrBg':
-        layout = graphBig(nth_cluster, num_graph)
+        layout = graphBig(nth_cluster, num_graph, GG)
         clsName = "fullgraph_class"
     #최대 그래프 개수
 
@@ -461,12 +461,26 @@ def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
 
     cluster = kmeans(result_,km_data[0]['number_of_cluster'] , km_data[0]['tolerance'],km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
 
-    emptylist = []
-    for i in range(km_data[0]['number_of_cluster']):
-        emptylist.append([])
-    for i in range(len(cluster.labels_)):
-        emptylist[cluster.labels_[i]].append(result.values.tolist())
+    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG
+    num_cluster = km_data[0]['number_of_cluster']
+    used_algorithm = 'Time Series Resampler & Kmeans'# 사용한 알고리즘 적용
+    siluet_score = plotSilhouette(result_ ,cluster)
+    labels = cluster.labels_
+    print(labels)
+    # GG = [[] ] * num_cluster
+    
+    for i in range(num_cluster):
+        GG.append([])
+    list_value = result.values.tolist()
+    for i in range(len(labels)):
+        GG[labels[i]].append(list_value[i])
+    print(np.shape(GG))
+    num_tsdatas_per_cluster = [len(ts_data) for ts_data in GG]
+    print(num_tsdatas_per_cluster)
+    for g in GG:
+        print(np.shape(GG))
     return [], [html.Label('data in!!')]
+
 # timeSeriesSample + hierarchy
 @app.callback(
     Output("hidden-ts-sample-hierarchy", "children"),
@@ -519,11 +533,15 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     print(all_feature.shape)
     cluster = kmeans(all_feature, km_data[0]['number_of_cluster'] , tolerance, km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
 
-    emptylist = []
-    for i in range(km_data[0]['number_of_cluster']):
-        emptylist.append([])
-    for i in range(len(cluster.labels_)):
-        emptylist[cluster.labels_[i]].append(result.values.tolist())
+    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG
+    num_cluster = km_data[0]['number_of_cluster']
+    used_algorithm = 'RP Autoencoder & Kmeans'# 사용한 알고리즘 적용
+    siluet_score = plotSilhouette(result_ ,cluster)
+    labels = cluster.labels_
+    GG = [[] * km_data[0]['number_of_cluster']]
+    for i in range(len(labels)):
+        GG[labels[i]].append(result.values.tolist())
+    num_tsdatas_per_cluster = [len(ts_data) for ts_data in GG]
 
     return []
 # rp-ae-hierarchy
@@ -687,8 +705,21 @@ def exct_wavelet_dbscan(n_clicks, wav_data, dbs_data):
 )
 def show_result(change):
     # , pca_show()·/
-    return textResultDiv(), graphCluster(), sd.detailGraphOption()
+    return textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm),\
+    graphCluster(GG),\
+    sd.detailGraphOption(num_cluster)
 # 학습 버튼을 클릭 하게 되면, i
 # Main
 if __name__ == "__main__":
+    # 결과 데이터
+    GG = []
+    # 클러스터 개수
+    num_cluster = 0
+    # 클러스터 당 시계열 데이터 개수
+    num_tsdatas_per_cluster = []
+    # 실루엣 점수
+    siluet_score = 0
+    # 사용 알고리즘
+    used_algorithm = ''
+    labels = []
     app.run_server(debug=True, threaded=True)

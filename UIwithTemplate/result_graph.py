@@ -6,10 +6,14 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
+
+
+
 # graph: dictionary 형태의 데이터
 # n: 한 군집 내 시계열 데이터 개수
 # label: 딕셔너리 keys(list형태)
 # color: 그래프 line 색
+
 def makeGraph_dictionary(graph, n, label, color):
     df=[]
     for i in range(0, n):
@@ -51,34 +55,6 @@ def updateLayout_Detail(figure, name, yaxis='value'):
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-
-GG = [
-    [ 
-        [0,1,2,5,4,8],
-        [5,2,4,6,5,4,3,7],
-        [4,11,2,6,5,1,2,7],
-        [7,4,5,7,4,1]
-    ],
-    [
-        [4,5,3,6,2],
-        [4,4,9,8,0,9],
-        [2,4,3,5,3,3,3,8],
-        [5,4,6,5,5,5]
-    ],
-    [
-        [4,2,3,2,4,3,4],
-        [7,6,5,6,6,5,4],
-        [3,2,3,4,5,4]
-    ],
-    [
-        [1,2,6,2,3,3,1],
-        [2,6,4,6,6,3,4],
-        [4,2,8,3,5,7]
-    ]
-]
-# 클러스터 개수를 담는다.
-num_clusters = len(GG)
-
 colors = {
     'background': 'dimgray',
     'text': 'white'
@@ -86,7 +62,7 @@ colors = {
 
 
 
-def graphCluster():
+def graphCluster(GG):
     figs=[]
     for i in range(0,len(GG)):
         figs.append(makeGraph_Cluster(GG[i], 'teal'))
@@ -104,7 +80,7 @@ def graphCluster():
 
     return graph
 
-def graphDetail(nth_cluster, num_graph):
+def graphDetail(nth_cluster, num_graph, GG):
     figs=[]
     for i in range(0, num_graph):
         figs.append(makeGraph_Detail(GG[nth_cluster][i], 'firebrick'))
@@ -122,7 +98,7 @@ def graphDetail(nth_cluster, num_graph):
     
     return graph
 
-def graphBig(nth_cluster, num_graph):
+def graphBig(nth_cluster, num_graph, GG):
     fig = []
     fig.append(makeGraph_Cluster(GG[nth_cluster][:num_graph], 'teal'))
     updateLayout(fig[0], 'cluster'+str(nth_cluster))
@@ -140,3 +116,18 @@ def graphBig(nth_cluster, num_graph):
 
     return graph
 
+def textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm):
+    textdata = html.Div(children=[
+        html.Div(["SUMMARIZATION"], className='subtitle'),
+        html.Div([
+            html.Div(children=f'군집 개수 : {num_cluster}개'),
+            html.Hr(),
+            html.Div(children=f'군집별 데이터 개수 : {num_tsdatas_per_cluster}'),
+            html.Hr(),
+            html.Div(children=f'실루엣 점수 : {siluet_score}'),
+            html.Hr(),
+            html.Div(children=f'사용된 알고리즘 : {used_algorithm}'),
+            html.Hr(),
+        ], className='textbox')
+    ])
+    return textdata
