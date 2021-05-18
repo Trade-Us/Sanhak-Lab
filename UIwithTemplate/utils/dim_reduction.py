@@ -1,6 +1,6 @@
 from tslearn.preprocessing import TimeSeriesResampler
 from sklearn.model_selection import train_test_split
-from agent import Autoencoder_Agent
+from utils.agent import Autoencoder_Agent
 import pywt
 import numpy as np
 

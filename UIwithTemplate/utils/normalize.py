@@ -1,11 +1,14 @@
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobusterScaler, MaxAbsScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler
 from tslearn.preprocessing import TimeSeriesScalerMeanVariance
 import numpy as np
 
 def MinMax(data):
-    MMS = MinMaxScaler().fit(data)
-    scaled = MMS.transform(data)
-    return scaled
+    result_list = data.values.tolist()
+    result_T = [list(x) for x in zip(*result_list)]
+    MMS = MinMaxScaler().fit(result_T)
+    scaled = MMS.transform(result_T)
+    result_scaled = [list(x) for x in zip(*scaled)]
+    return result_scaled
 
 def Standard(data):
     SS = StandardScaler().fit(data)
@@ -13,7 +16,7 @@ def Standard(data):
     return scaled
 
 def Robust(data):
-    RS = RobusterScaler().fit(data)
+    RS = RobustScaler().fit(data)
     scaled = RS.transform(data)
     return scaled
 

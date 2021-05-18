@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 # Cluster Algorithm
-def kmeans(dataset, n_clusters, n_init = 10, max_iter = 300, tol = e-4):
+def kmeans(dataset, n_clusters, tol ,n_init = 10, max_iter = 300):
 
     cluster_data = KMeans(n_clusters=n_clusters, n_init = n_init, max_iter = max_iter, tol = tol).fit(dataset)
     return cluster_data

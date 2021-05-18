@@ -6,6 +6,13 @@ import dash_html_components as html
 import pandas as pd
 
 # Import for algorithm
+# from utils.readFile import*
+# from utils.dim_reduction import*
+from utils.readFile import split_into_values
+from utils.dim_reduction import exec_ts_resampler, fit_autoencoder
+from utils.normalize import MinMax, Standard,Robust,MaxAbsScaler,tsleanr_scaler
+from utils.clustering import *
+from utils.imagination import *
 from clusters import *
 from read_csv import csvDiv, parse_contents
 from text_data import textResultDiv
@@ -423,6 +430,21 @@ def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
     print(parti_columns)
     print(value)
     print(normalize)
+    df = pd.read_csv('.\\data\\saved_data.csv')
+    value_ = [value]
+    df = df.loc[:,parti_columns + value_]
+    result = split_into_values(df, parti_columns)
+    min=result.dropna(axis='columns')
+    min_len=len(min.columns)
+    if normalize == "MMS":
+        result = MinMax(result)
+    result_ = exec_ts_resampler(result,min_len)
+    result_ = result_.reshape(result_.shape[0],min_len)
+    print(result_.shape)
+
+    result = kmeans(result_,km_data[0]['number_of_cluster'] ,float(km_data[0]['tolerance']),km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
+
+    print(result.labels_)
     return []
 # timeSeriesSample + hierarchy
 @app.callback(
@@ -453,6 +475,25 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     print(parti_columns)
     print(value)
     print(normalize)
+    df = pd.read_csv('.\\data\\saved_data.csv')
+    value_ = [value]
+    df = df.loc[:,parti_columns + value_]
+    result = split_into_values(df, parti_columns)
+    min=result.dropna(axis='columns')
+    min_len=len(min.columns)
+    if normalize == "MMS":
+        result = MinMax(result)
+    result_ = exec_ts_resampler(result,rp_data[0]['image_size'])
+    #(242,28,1)
+    result_ = result_.reshape(result_.shape[0],1,result_.shape[1])
+    #(242,28,28)
+    X = toRPdata(result_,rp_data[0]['dimension'],rp_data[0]['time_delay'],None,rp_data[0]['percentage'])
+    X_expand = np.expand_dims(X,axis=3)
+    print(X_expand.shape)
+    all_feature = fit_autoencoder(X_expand,rp_data[0]['image_size'],32,'Adam',3e-5,ae_data[0]['activation_function'],'binary_crossentropy',ae_data[0]['batch_size'],5)
+    print(all_feature.shape)
+    result = kmeans(all_feature,km_data[0]['number_of_cluster'] ,float(km_data[0]['tolerance']),km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
+
     return []
 # rp-ae-hierarchy
 @app.callback(

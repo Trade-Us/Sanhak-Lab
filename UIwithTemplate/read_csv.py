@@ -40,7 +40,7 @@ def parse_contents(contents, filename, date):
             # Assume that the user uploaded a CSV file
             df = pd.read_csv(
                 io.StringIO(decoded.decode('utf-8')))
-            df.to_csv('.\\data\\'+filename,sep=',',na_rep='NaN')
+            df.to_csv('.\\data\\saved_data.csv',sep=',',na_rep='NaN')
         elif 'xls' in filename:
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded))
