@@ -231,25 +231,26 @@ h3 {
   margin-top: 1.5rem;
 }
 h4 {
-  font-size: 2.6rem;
+  font-size: 2.4rem;
   line-height: 1.35;
   letter-spacing: -0.08rem;
   margin-bottom: 1.2rem;
   margin-top: 1.2rem;
+  color: #868686;
 }
 h5 {
-  font-size: 2.2rem;
+  font-size: 2rem;
   line-height: 1.5;
   letter-spacing: -0.05rem;
   margin-bottom: 0.6rem;
   margin-top: 0.6rem;
 }
 h6 {
-  font-size: 2rem;
+  font-size: 1.8rem;
   line-height: 1.6;
   letter-spacing: 0;
-  margin-bottom: 0.75rem;
   margin-top: 0.75rem;
+  color: #868686;
 }
 
 p {
@@ -499,8 +500,8 @@ ol {
 /* Misc
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 hr {
-  margin-top: 3rem;
-  margin-bottom: 3.5rem;
+  margin-top: 2em;
+  margin-bottom: 3rem;
   border-width: 0;
   border-top: 1px solid #e1e1e1;
 }
@@ -624,8 +625,8 @@ there.
 /* 그래프 여러가지 보기 설정*/
 .graph{
     display: inline-block;
-    width:30%;
-    padding: 10px;
+    width:31%;
+    margin: 10px;
 }
 
 .graph-hover:hover{
@@ -743,13 +744,18 @@ there.
 .dash-dropdown,
 #number-of-cluster,
 #learning-rate,
-#try_n_init,
+#try-n-init,
 #try_n_kmeans,
 #image-data-type,
 #dimension,
+#mtf-n-bins,
+#image-size,
 #time-delay,
+#autoencoder-learning-rate,
+#try-n-kmeans,
+#ts-resampler-dim,
 #percentage{
-  width: 90%;
+  width: 80%;
 }
 
 #algorithm > div{
@@ -757,9 +763,6 @@ there.
   text-align: left;
 }
 
-#cross-filter-options>div>div>div>div{
-  padding:1%;
-}
 #random_center{
   text-align: left;
 }
@@ -768,28 +771,67 @@ there.
 
 .textTitle{
   text-align: center;
-  color: #7c795d; 
-  font-family: 'Trocchi', serif; 
+  /* font-family: 'Trocchi', serif;  */
   font-size: 40px; 
   font-weight: bold; 
+  color:#868686;
   margin: 0;
 }
 
 .subtitle{
-  font-family: 'Trocchi', serif; 
-  font-size: 20px; 
-  margin: 0;
-}
-
-.circle{
-  background-color: white;
-  border-radius: 50%;
-  height: 450px;
-  /* text-align: center;  */
-}
-
-.text-pca{
-  display: inline-block;
+  /* font-family: 'Trocchi', serif;  */
+  font-size: 30px; 
+  font-weight: bold;
+  color: #a0a0a0;
   padding: 10px;
-  width: 46%;
+  background-color: #f0f0f0;
+  text-align: center;
+}
+
+.textdiv{
+  height: inherit;
+  text-align: center;
+  background-color: white;
+
+} 
+
+.text-pca1{
+  display: inline-block;
+  margin: 2em;
+  width: 40%;
+}
+
+.text-pca2{
+  display: inline-block;
+  margin: 2em;
+  width: 60%;
+}
+
+.textbox{
+  font-size: 20px;
+  padding: 1em;
+  height: inherit;
+  font-weight: bold;
+  color: #a0a0a0;
+}
+.textbox Hr{
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  margin-left: 3em;
+  margin-right: 3em;
+  border-width: 0;
+  border-top: 1px solid #e1e1e1;
+}
+.graphdiv{
+  background-color: white;
+}
+
+.clusters{
+  margin: 2em;
+}
+
+/* parameter css */
+#main-cluster-algorithm{
+  margin: 10px;
+  font-size: inherit;
 }

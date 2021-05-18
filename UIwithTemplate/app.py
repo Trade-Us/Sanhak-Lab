@@ -55,9 +55,8 @@ app.layout = html.Div(
                     [
                         html.Div(
                             [
-                                html.H3(
+                                html.H1(
                                     "Time-series Clustering ",
-                                    style={"margin-bottom": "0px"},
                                 ),
                                 html.H5(
                                     "Kwangwoon Univ. team 일이삼사", style={"margin-top": "0px"}
@@ -85,6 +84,7 @@ app.layout = html.Div(
             [
                 # 파라미터 조작 컴포넌트
                 html.Div([
+                    html.H3("Parameters"),
                     dcc.Dropdown(
                         id='main-cluster-algorithm',
                         options=[
@@ -128,6 +128,7 @@ app.layout = html.Div(
                             {'label': 'Time Series Scaler Mean Variance', 'value':'TSS'}
                         ], value='MMS'),
                 ]),
+                        html.Hr(),
                     html.Div(id='parameter-layout')],
                     className="pretty_container four columns",
                     id="cross-filter-options",
@@ -146,6 +147,7 @@ app.layout = html.Div(
                             id="info-container",
                             className="row container-display",
                         ),
+
                         # 군집화 결과 그래프 컴포넌트
                         html.Div([
                             html.Div([html.Div("CLUSTERING REPORT")], className='textTitle'),
@@ -153,14 +155,14 @@ app.layout = html.Div(
                             html.Div([
                                 html.Div([
                                     textResultDiv()
-                                ], className='text-pca'),
+                                ], className='text-pca1 textdiv'),
                                 html.Div([
                                     # pca_show()
-                                ], className='text-pca')
-                            ], className='row container-display subtitle'),
+                                ], className='text-pca2')
+                            ], className='row container-display'),
                             html.Div([
                                 graphCluster()
-                            ], className = 'box-scroll subtitle')
+                            ], className = 'box-scroll')
                         ],
                             id="countGraphContainer",
                             className="pretty_container",

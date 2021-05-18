@@ -5,7 +5,7 @@ import dash_daq as daq
 def rp_layout():
     return html.Div(id='rp-param', children=[
         dcc.Store(id='store-rp-param', data=[]),
-        html.H5("RP Parameters"),
+        html.H4("RP Parameters"),
         html.H6("Image Size"),
         html.Label("생성할 이미지 크기 결정"),
         dcc.Input(id='image-size', value=28, min=28, type='number'),
@@ -34,7 +34,7 @@ def rp_layout():
 def gaf_layout():
     return html.Div(id='gaf-param', children=[
         dcc.Store(id='store-gaf-param', data=[]),
-        html.H5("GAF Parameters"),
+        html.H4("GAF Parameters"),
         html.H6("Image Size"),
         html.Label("생성할 이미지 크기 결정"),
         dcc.Input(id='image-size', value=2, min=2, type='number'),
@@ -46,12 +46,13 @@ def gaf_layout():
                 {'label': 'summation', 'value':'SUM'},
                 {'label': 'difference', 'value':'DIF'}
             ], value='SUM'),
+        html.Hr()
     ])
     
 def mtf_layout():
     return html.Div(id='mtf-param', children=[
         dcc.Store(id='store-mtf-param', data=[]),
-        html.H5("MTF Parameters"),
+        html.H4("MTF Parameters"),
         html.H6("Image Size"),
         html.Label("생성할 이미지 크기 결정"),
         dcc.Input(id='image-size', value=2, min=2, type='number'),
@@ -59,10 +60,12 @@ def mtf_layout():
         html.H6("Bins"),
         html.Label("number of bins (size of alphabet)"),
         dcc.Input(id='mtf-n-bins', value=5, min=2, max=10, type='number'),
+        html.Label("Strategy"),
         dcc.Dropdown(id='mtf-strategy',
             options=[
                 {'label': 'quantile', 'value':'QUN'},
                 {'label': 'uniform', 'value':'UNI'},
                 {'label': 'normal', 'value':'NOR'}
             ], value='QUN'),
+        html.Hr()
     ])

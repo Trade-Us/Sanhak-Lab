@@ -92,15 +92,15 @@ def graphCluster():
         figs.append(makeGraph_Cluster(GG[i], 'teal'))
         updateLayout(figs[i], 'cluster'+str(i))
     graph = html.Div(style={ }, children=[
-        html.Div("CLUSTERS"),
+        html.Div(["CLUSTERS"], className='subtitle'),
         html.Div(
             [html.Div(
                 dcc.Graph(id=f'GC{i}', figure=fig), 
                 className='graph graph-hover'
                 ) for i, fig in enumerate(figs)
-            ]
+            ], className='graphdiv'
         )
-    ])
+    ], className='clusters')
 
     return graph
 

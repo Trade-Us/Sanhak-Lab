@@ -5,7 +5,7 @@ import dash_daq as daq
 def normalization_layout():
     return html.Div(id='normalization-param', children=[
         dcc.Store(id='store-normalization-param', data=[]),
-        html.H5("normalization Parameters"),
+        html.H4("normalization Parameters"),
         html.Label('normalization method Before Training'),
         dcc.Dropdown(id='normalization-method',
             options=[
