@@ -150,19 +150,20 @@ app.layout = html.Div(
 
                         # 군집화 결과 그래프 컴포넌트
                         html.Div([
+                            html.Div(id='hidden-result-box', style={'display':'none'}),
                             html.Div([html.Div("CLUSTERING REPORT")], className='textTitle'),
                             html.Hr(),
                             html.Div([
-                                html.Div([
-                                    textResultDiv()
-                                ], className='text-pca1 textdiv'),
-                                html.Div([
+                                html.Div(id='text-result',
+                                    # textResultDiv(), pca_show(), graphCluster(), sd.detailGraphOption(),
+                                className='text-pca1 textdiv'),
+                                html.Div(id='graph-cluster-result',
                                     # pca_show()
-                                ], className='text-pca2')
-                            ], className='row container-display'),
-                            html.Div([
-                                graphCluster()
-                            ], className = 'box-scroll')
+                                className='text-pca2')
+                            ],  className='row container-display'),
+                            html.Div(id='graph-result',
+                                # graphCluster()
+                            className = 'box-scroll')
                         ],
                             id="countGraphContainer",
                             className="pretty_container",
@@ -181,8 +182,8 @@ app.layout = html.Div(
                 html.Div(
                     id='detail-graph-output'
                 ),
-                html.Div(
-                    sd.detailGraphOption(),
+                html.Div(id='detail-graph-option',
+                    # sd.detailGraphOption(),
                     className = "floatright"
                 )
             ],
@@ -426,6 +427,7 @@ def store_normalization_param(method):
 # timeSeriesSample + kmeans
 @app.callback(
     Output("hidden-ts-sample-kmeans", "children"),
+    Output("hidden-result-box", 'children'),
     Input("learn-button", "n_clicks"),
     State("store-kmeans-param", 'data'),
     State("partitioning-column-data", 'value'),
@@ -455,16 +457,16 @@ def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
     result_ = result_.reshape(result_.shape[0],min_len)
     print(result_.shape)
     
-    cluster = kmeans(result_,km_data[0]['number_of_cluster'] , tolerance,km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
-    
+    # print(result.labels_)
+
+    cluster = kmeans(result_,km_data[0]['number_of_cluster'] , km_data[0]['tolerance'],km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
+
     emptylist = []
     for i in range(km_data[0]['number_of_cluster']):
         emptylist.append([])
     for i in range(len(cluster.labels_)):
         emptylist[cluster.labels_[i]].append(result.values.tolist())
-    
-    # print(result.labels_)
-    return []
+    return [], [html.Label('data in!!')]
 # timeSeriesSample + hierarchy
 @app.callback(
     Output("hidden-ts-sample-hierarchy", "children"),
@@ -674,6 +676,18 @@ def exct_wavelet_dbscan(n_clicks, wav_data, dbs_data):
     print(wav_data)
     print(dbs_data)
     return []
+
+@app.callback(
+    Output("text-result", 'children'),
+    Output("graph-cluster-result", 'children'),
+    # Output("graph-result", 'children'),
+    Output("detail-graph-option", 'children'),
+    Input("hidden-result-box", 'children'),
+    prevent_initial_call=True 
+)
+def show_result(change):
+    # , pca_show()·/
+    return textResultDiv(), graphCluster(), sd.detailGraphOption()
 # 학습 버튼을 클릭 하게 되면, i
 # Main
 if __name__ == "__main__":
