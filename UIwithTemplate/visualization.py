@@ -1,87 +1,86 @@
 import pandas as pd
 import numpy as np
-from readFile import split_into_values
-from tslearn.preprocessing import TimeSeriesScalerMeanVariance, TimeSeriesResampler
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
 import dash_html_components as html
 import plotly.graph_objects as go
 import dash_core_components as dcc
 
-# columns 와 value는 사용자 입력
-df = pd.read_csv('data/CLAMP_resample.csv')
-columns = ['chip', 'wire', 'segment']
-value = ['value']
-#df = pd.read_csv('resources/Dataset1.csv')
-#columns = ['Process', 'Step']
-#value = ['Value']
+data = [
+    [ 
+        [5,8,2,2],
+        [5,2,4,6,5,4,3,7,7,8,7,4],
+        [4,11,2,1,2,7],
+        [7,4,5,7,4,0,7,2,3,1]
+    ],
+    [
+        [4,5,3,4,4,4,2,0,6,2],
+        [4,4,0,9],
+        [2,4,3,5,3,3,6,7,3,8],
 
-df = df.loc[:, columns + value] #('chip', 'wire', 'value')는 사용자 입력
-result = split_into_values(df, columns)
+    ],
+    [
+        [4,2,3,2,4,3,4],
+        [7,6,5,6,6,5,4],
+        [3,2,3,4,5,4],
+        [4,4,0,9],
+        [2,4,3,5,3,3,6,7,3,8],
+        [5,4,5,5]
+    ],
+    [
+        [1,2,6,2,3,3,1],
+        [2,6,4,6,6,3,4],
+        [4,2,8,3,5,7],
+        [5,4,5,5],
+        [4,3,4,8,9,2,2,2]
+    ]
+]
 
-min=result.dropna(axis='columns')
-min_len=len(min.columns)
-result_ = TimeSeriesResampler(sz=min_len).fit_transform(result)
-result_=result_.reshape(1140,min_len)
+#시계열셋 최소 길이 리스트형태로 담음
+min_lens=[]
+data_len=len(data)
+for i in range(0,data_len):
+    min=len(data[i][0])
+    for j in range(0,len(data[i])):
+        if len(data[i][j]) < min:
+            min = len(data[i][j])
+    min_lens.append(min)
 
-result_norm = StandardScaler().fit_transform(result_)
+#시계열 셋 길이 통일
+from tslearn.preprocessing import TimeSeriesScalerMeanVariance, TimeSeriesResampler
+result_re=[]
+for i in range(0,data_len):
+    result_ = TimeSeriesResampler(sz=min_lens[i]).fit_transform(data[i])
+    result_=result_.reshape(len(data[i]),min_lens[i])
+    result_re.append(result_)
 
-pca = PCA(n_components=2) 
-result_pca = pca.fit_transform(result_norm)
+#수치형 변수 정규화
+from sklearn.preprocessing import StandardScaler
+result_norm=[]
+for i in range(0, data_len):
+    norm = StandardScaler().fit_transform(result_re[i])
+    result_norm.append(norm)
 
-result_label=[1,2,3,4,5,6]*190
-result_list=result_pca.tolist()
-result_cluster=[[],[],[],[],[],[]]
 
-for i in range(0,1140):
-    if result_label[i] ==1:
-        result_cluster[0].append(result_list[i])
-    elif result_label[i] ==2:
-        result_cluster[1].append(result_list[i])
-    elif result_label[i] ==3:
-        result_cluster[2].append(result_list[i])
-    elif result_label[i] ==4:
-        result_cluster[3].append(result_list[i])
-    elif result_label[i] ==5:
-        result_cluster[4].append(result_list[i])
-    elif result_label[i] ==6:
-        result_cluster[5].append(result_list[i])
+#주성분 분석 실시하기
+from sklearn.decomposition import PCA
 
-result_arr = np.array(result_cluster)
+#PCA 객체 생성 (주성분 갯수 2개 생성)
+pca = PCA(n_components=2)
+result_pca=[]
+for i in range(0,data_len):
+    pca_ = pca.fit_transform(result_norm[i])
+    result_pca.append(pca_)
 
+#그래프 그리기
 fig = go.Figure()
-fig.add_trace(go.Scatter(
-    x=result_arr[0][:,0], y= result_arr[0][:,1],
-    mode='markers', name='cluster1'
-    )
-)
-fig.add_trace(go.Scatter(
-    x=result_arr[1][:,0], y= result_arr[1][:,1],
-    mode='markers', name='cluster2'
-    )
-)
-fig.add_trace(go.Scatter(
-    x=result_arr[2][:,0], y= result_arr[2][:,1],
-    mode='markers', name='cluster3'
-    )
-)
-fig.add_trace(go.Scatter(
-    x=result_arr[3][:,0], y= result_arr[3][:,1],
-    mode='markers', name='cluster4'
-    )
-)
-fig.add_trace(go.Scatter(
-    x=result_arr[4][:,0], y= result_arr[4][:,1],
-    mode='markers', name='cluster5'
-    )
-)
-fig.add_trace(go.Scatter(
-    x=result_arr[5][:,0], y= result_arr[5][:,1],
-    mode='markers', name='cluster6'
-    )
-)
 
+for i in range(0,data_len):
+    fig.add_trace(go.Scatter(
+        x=result_pca[i][:,0], y= result_pca[i][:,1],
+        mode='markers', name='cluster'+str(i)
+        )
+    )
 
 def pca_show():
     graph = html.Div(style={}, children=[
