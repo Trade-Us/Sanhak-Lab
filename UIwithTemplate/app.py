@@ -48,9 +48,8 @@ app.layout = html.Div(
                     [
                         html.Div(
                             [
-                                html.H3(
+                                html.H1(
                                     "Time-series Clustering ",
-                                    style={"margin-bottom": "0px"},
                                 ),
                                 html.H5(
                                     "Kwangwoon Univ. team 일이삼사", style={"margin-top": "0px"}
@@ -78,6 +77,7 @@ app.layout = html.Div(
             [
                 # 파라미터 조작 컴포넌트
                 html.Div([
+                    html.H3("Parameters"),
                     dcc.Dropdown(
                         id='main-cluster-algorithm',
                         options=[
@@ -98,6 +98,7 @@ app.layout = html.Div(
                                     {'label': 'Wavelet + DBSCAN', 'value':'wavelet_dbscan'},
                                 ],
                         value='ts_sample_kmeans'),
+                        html.Hr(),
                     html.Div(id='parameter-layout')],
                     className="pretty_container four columns",
                     id="cross-filter-options",

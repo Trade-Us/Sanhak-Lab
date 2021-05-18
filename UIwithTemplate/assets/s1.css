@@ -231,25 +231,26 @@ h3 {
   margin-top: 1.5rem;
 }
 h4 {
-  font-size: 2.6rem;
+  font-size: 2.4rem;
   line-height: 1.35;
   letter-spacing: -0.08rem;
   margin-bottom: 1.2rem;
   margin-top: 1.2rem;
+  color: #868686;
 }
 h5 {
-  font-size: 2.2rem;
+  font-size: 2rem;
   line-height: 1.5;
   letter-spacing: -0.05rem;
   margin-bottom: 0.6rem;
   margin-top: 0.6rem;
 }
 h6 {
-  font-size: 2rem;
+  font-size: 1.8rem;
   line-height: 1.6;
   letter-spacing: 0;
-  margin-bottom: 0.75rem;
   margin-top: 0.75rem;
+  color: #868686;
 }
 
 p {
@@ -499,7 +500,8 @@ ol {
 /* Misc
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 hr {
-  margin-bottom: 3.5rem;
+  margin-top: 2em;
+  margin-bottom: 3rem;
   border-width: 0;
   border-top: 1px solid #e1e1e1;
 }
@@ -742,13 +744,18 @@ there.
 .dash-dropdown,
 #number-of-cluster,
 #learning-rate,
-#try_n_init,
+#try-n-init,
 #try_n_kmeans,
 #image-data-type,
 #dimension,
+#mtf-n-bins,
+#image-size,
 #time-delay,
+#autoencoder-learning-rate,
+#try-n-kmeans,
+#ts-resampler-dim,
 #percentage{
-  width: 90%;
+  width: 80%;
 }
 
 #algorithm > div{
@@ -756,9 +763,6 @@ there.
   text-align: left;
 }
 
-#cross-filter-options>div>div>div>div{
-  padding:1%;
-}
 #random_center{
   text-align: left;
 }
@@ -824,4 +828,10 @@ there.
 
 .clusters{
   margin: 2em;
+}
+
+/* parameter css */
+#main-cluster-algorithm{
+  margin: 10px;
+  font-size: inherit;
 }

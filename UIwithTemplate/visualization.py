@@ -9,10 +9,6 @@ import dash_html_components as html
 import plotly.graph_objects as go
 import dash_core_components as dcc
 
-
-
-
-
 # columns 와 value는 사용자 입력
 df = pd.read_csv('data/CLAMP_resample.csv')
 columns = ['chip', 'wire', 'segment']
