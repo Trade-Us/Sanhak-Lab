@@ -499,7 +499,6 @@ ol {
 /* Misc
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 hr {
-  margin-top: 3rem;
   margin-bottom: 3.5rem;
   border-width: 0;
   border-top: 1px solid #e1e1e1;
@@ -624,8 +623,8 @@ there.
 /* 그래프 여러가지 보기 설정*/
 .graph{
     display: inline-block;
-    width:30%;
-    padding: 10px;
+    width:31%;
+    margin: 10px;
 }
 
 .graph-hover:hover{
@@ -768,28 +767,61 @@ there.
 
 .textTitle{
   text-align: center;
-  color: #7c795d; 
-  font-family: 'Trocchi', serif; 
+  /* font-family: 'Trocchi', serif;  */
   font-size: 40px; 
   font-weight: bold; 
+  color:#868686;
   margin: 0;
 }
 
 .subtitle{
-  font-family: 'Trocchi', serif; 
-  font-size: 20px; 
-  margin: 0;
-}
-
-.circle{
-  background-color: white;
-  border-radius: 50%;
-  height: 450px;
-  /* text-align: center;  */
-}
-
-.text-pca{
-  display: inline-block;
+  /* font-family: 'Trocchi', serif;  */
+  font-size: 30px; 
+  font-weight: bold;
+  color: #a0a0a0;
   padding: 10px;
-  width: 46%;
+  background-color: #f0f0f0;
+  text-align: center;
+}
+
+.textdiv{
+  height: inherit;
+  text-align: center;
+  background-color: white;
+
+} 
+
+.text-pca1{
+  display: inline-block;
+  margin: 2em;
+  width: 40%;
+}
+
+.text-pca2{
+  display: inline-block;
+  margin: 2em;
+  width: 60%;
+}
+
+.textbox{
+  font-size: 20px;
+  padding: 1em;
+  height: inherit;
+  font-weight: bold;
+  color: #a0a0a0;
+}
+.textbox Hr{
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  margin-left: 3em;
+  margin-right: 3em;
+  border-width: 0;
+  border-top: 1px solid #e1e1e1;
+}
+.graphdiv{
+  background-color: white;
+}
+
+.clusters{
+  margin: 2em;
 }

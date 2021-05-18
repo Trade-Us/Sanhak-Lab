@@ -35,12 +35,16 @@ def wavelet_layout():
         dcc.Input(id='wavelet-function', value='bd2'),
         html.Label('iteration to half data'),
         dcc.Input(id='iteration-make-half-dim', min=2, value=2, type='number'),
+        html.Hr()
+
     ])
 def timeseries_resampler_layout():
     return html.Div(id='ts-resampler-param', children=[
         dcc.Store(id='store-ts-resampler-param', data=[]),
-        html.H5("time series resampler Parameters"),
+        html.H5("Timeseries Resampler Parameters"),
         html.Label('dimension to reduce yout ts data'),
         dcc.Input(id='ts-resampler-dim', min=2, value=2, type='number'),
+        html.Hr()
+
     ])
     

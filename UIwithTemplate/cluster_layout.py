@@ -53,6 +53,7 @@ def time_sereies_kmeans_layout():
     layout = html.Div([
             html.Div(id='hidden-tsk-div', style={'display':'none'}),
             dcc.Store(id='store-distance-algorithm', data=[]),
+            html.H5("TimeseriesKmeans Parameters"),
             html.Label('Cluster 개수'),
             dcc.Input(id='number-of-cluster', min=2, value=2, type='number'),
             html.Label('거리계산 알고리즘'),
@@ -63,7 +64,6 @@ def time_sereies_kmeans_layout():
                     {'label':'DTW', 'value':'DTW'},
                     {'label':'Soft-DTW', 'value':'SDT'}
                 ], value='DTW'),
-            html.H5('dtw, soft-dtw 경우 설정하는 파라미터: barycenter, gamma'),
             html.Label('path 구하는 알고리즘 돌리는 횟수'),
             dcc.Input(id='try_n_barycenter', value=100, min=100, max=200, type='number'),
             html.Label('Metric Gammas 높을 수록 부드러우지지만, 시간이 걸림'),
@@ -72,5 +72,6 @@ def time_sereies_kmeans_layout():
             value=0.1),
             html.Label('Try N Times for another center'),
             dcc.Input(id='try-n-init', min=1, value=10, type='number'),
+            html.Hr()
         ], style={'columnCount': 1})
     return layout
