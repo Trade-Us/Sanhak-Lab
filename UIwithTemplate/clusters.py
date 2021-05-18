@@ -26,6 +26,7 @@ def ts_sample_ts_kmeans():
 def rp_ae_kmeans():
     return html.Div(id='rp-ae-kmeans', children=[
         html.Div(id='hidden-rp-ae-kmeans', style={'display':'none'}),
+        html.Div(id='hidden-rp-ae-result-box', style={'display':'none'}),
         rp_layout(),
         autoencoder_layout(),
         kmeans_layout(),

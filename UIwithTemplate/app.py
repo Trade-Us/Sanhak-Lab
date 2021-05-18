@@ -442,10 +442,6 @@ def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
     print(value)
     print(normalize)
 
-    tolerance = km_data[0]['tolerance']
-    if tolerance == 'None':
-        tolerance = None
-
     df = pd.read_csv('.\\data\\saved_data.csv')
     value_ = [value]
     df = df.loc[:,parti_columns + value_]
@@ -508,6 +504,7 @@ def exct_ts_sample_hierarchy(n_clicks, hrc_data):
 # rp-ae-kmeans
 @app.callback(
     Output("hidden-rp-ae-kmeans", "children"),
+    Output("hidden-rp-ae-result-box", 'children'),
     Input("learn-button", "n_clicks"),
     State("store-rp-param", 'data'),
     State("store-autoencoder-param", 'data'),
@@ -524,9 +521,9 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     print(parti_columns)
     print(value)
     print(normalize)
-    tolerance = km_data[0]['tolerance']
-    if tolerance == 'None':
-        tolerance = None
+    threshold = rp_data[0]['threshold']
+    if threshold == 'None':
+        threshold = None
 
     df = pd.read_csv('.\\data\\saved_data.csv')
     value_ = [value]
@@ -536,16 +533,17 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     min_len=len(min.columns)
     if normalize == "MMS":
         result_nom = MinMax(result)
-    result_ = exec_ts_resampler(result_nom,rp_data[0]['image_size'])
+    result_resample = exec_ts_resampler(result_nom,rp_data[0]['image_size'])
     #(242,28,1)
-    result_ = result_.reshape(result_.shape[0],1,result_.shape[1])
+    result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
     #(242,28,28)
-    X = toRPdata(result_,rp_data[0]['dimension'],rp_data[0]['time_delay'],rp_data[0]['threshold'],rp_data[0]['percentage'] / 100)
+    X = toRPdata(result_,rp_data[0]['dimension'],rp_data[0]['time_delay'],threshold,rp_data[0]['percentage'] / 100)
     X_expand = np.expand_dims(X,axis=3)
     print(X_expand.shape)
     all_feature = fit_autoencoder(X_expand,rp_data[0]['image_size'],ae_data[0]['dimension_feature'],ae_data[0]['optimizer'],(3e-7) * (10**ae_data[0]['learning_rate']),ae_data[0]['activation_function'],ae_data[0]['loss_function'],ae_data[0]['batch_size'],ae_data[0]['epoch'])
     print(all_feature.shape)
-    cluster = kmeans(all_feature, km_data[0]['number_of_cluster'] , tolerance, km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
+    print(all_feature)
+    cluster = kmeans(all_feature, km_data[0]['number_of_cluster'] , km_data[0]['tolerance'], km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
 
     global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG, origin_data
     origin_data = []
@@ -563,7 +561,7 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     origin_data = result
     num_cluster = km_data[0]['number_of_cluster']
     used_algorithm = 'RP Autoencoder & Kmeans'# 사용한 알고리즘 적용
-    siluet_score = plotSilhouette(result_ ,cluster)
+    siluet_score = plotSilhouette(result_resample.reshape(result_resample.shape[0], rp_data[0]['image_size']) ,cluster)
     labels = cluster.labels_
     for i in range(num_cluster):
         GG.append([])
@@ -572,7 +570,7 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
         GG[labels[i]].append(list_value[i])
     num_tsdatas_per_cluster = [len(ts_data) for ts_data in GG]
 
-    return []
+    return [], 'load'
 # rp-ae-hierarchy
 @app.callback(
     Output("hidden-rp-ae-hierarchy", "children"),
@@ -730,9 +728,10 @@ def exct_wavelet_dbscan(n_clicks, wav_data, dbs_data):
     Output("graph-result", 'children'),
     Output("detail-graph-option", 'children'),
     Input("hidden-result-box", 'children'),
+    Input("hidden-rp-ae-result-box", 'children'),
     prevent_initial_call=True 
 )
-def show_result(change):
+def show_result(change1, change2):
     # , pca_show()·/
     return textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm),\
     pca_show(origin_data, labels, num_cluster),\
