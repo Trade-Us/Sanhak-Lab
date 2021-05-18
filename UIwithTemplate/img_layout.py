@@ -8,7 +8,7 @@ def rp_layout():
         html.H5("RP Parameters"),
         html.H6("Image Size"),
         html.Label("생성할 이미지 크기 결정"),
-        dcc.Input(id='image-size', value=2, min=2, type='number'),
+        dcc.Input(id='image-size', value=28, min=28, type='number'),
         html.H6("Dimension"),
         html.Label("RP 궤적의 차원수를 결정한다. 공간 궤적 좌표 생성에 쓰이는 데이터 개수이다."),
         dcc.Input(id='dimension', value=1, min=1, type='number'),
