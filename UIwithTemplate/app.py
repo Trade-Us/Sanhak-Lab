@@ -462,7 +462,20 @@ def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
 
     cluster = kmeans(result_,km_data[0]['number_of_cluster'] , km_data[0]['tolerance'],km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
 
-    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG
+    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG, origin_data
+    origin_data = []
+    # 결과 데이터
+    GG = []
+    # 클러스터 개수
+    num_cluster = 0
+    # 클러스터 당 시계열 데이터 개수
+    num_tsdatas_per_cluster = []
+    # 실루엣 점수
+    siluet_score = 0
+    # 사용 알고리즘
+    used_algorithm = ''
+    labels = []
+    origin_data = result
     num_cluster = km_data[0]['number_of_cluster']
     used_algorithm = 'Time Series Resampler & Kmeans'# 사용한 알고리즘 적용
     siluet_score = plotSilhouette(result_ ,cluster)
@@ -534,14 +547,29 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     print(all_feature.shape)
     cluster = kmeans(all_feature, km_data[0]['number_of_cluster'] , tolerance, km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
 
-    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG
+    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG, origin_data
+    origin_data = []
+    # 결과 데이터
+    GG = []
+    # 클러스터 개수
+    num_cluster = 0
+    # 클러스터 당 시계열 데이터 개수
+    num_tsdatas_per_cluster = []
+    # 실루엣 점수
+    siluet_score = 0
+    # 사용 알고리즘
+    used_algorithm = ''
+    labels = []
+    origin_data = result
     num_cluster = km_data[0]['number_of_cluster']
     used_algorithm = 'RP Autoencoder & Kmeans'# 사용한 알고리즘 적용
     siluet_score = plotSilhouette(result_ ,cluster)
     labels = cluster.labels_
-    GG = [[] * km_data[0]['number_of_cluster']]
+    for i in range(num_cluster):
+        GG.append([])
+    list_value = result.values.tolist()
     for i in range(len(labels)):
-        GG[labels[i]].append(result.values.tolist())
+        GG[labels[i]].append(list_value[i])
     num_tsdatas_per_cluster = [len(ts_data) for ts_data in GG]
 
     return []
@@ -699,7 +727,7 @@ def exct_wavelet_dbscan(n_clicks, wav_data, dbs_data):
 @app.callback(
     Output("text-result", 'children'),
     Output("graph-cluster-result", 'children'),
-    # Output("graph-result", 'children'),
+    Output("graph-result", 'children'),
     Output("detail-graph-option", 'children'),
     Input("hidden-result-box", 'children'),
     prevent_initial_call=True 
@@ -707,11 +735,14 @@ def exct_wavelet_dbscan(n_clicks, wav_data, dbs_data):
 def show_result(change):
     # , pca_show()·/
     return textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm),\
+    pca_show(origin_data, labels, num_cluster),\
     graphCluster(GG),\
     sd.detailGraphOption(num_cluster)
 # 학습 버튼을 클릭 하게 되면, i
 # Main
 if __name__ == "__main__":
+    # 본 데이터
+    origin_data = []
     # 결과 데이터
     GG = []
     # 클러스터 개수
@@ -723,4 +754,4 @@ if __name__ == "__main__":
     # 사용 알고리즘
     used_algorithm = ''
     labels = []
-    app.run_server(debug=True, threaded=True)
+    app.run_server( threaded=True)

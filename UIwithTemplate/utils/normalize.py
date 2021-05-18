@@ -11,9 +11,12 @@ def MinMax(data):
     return result_scaled
 
 def Standard(data):
-    SS = StandardScaler().fit(data)
-    scaled = SS.transform(data)
-    return scaled
+    result_list = data.values.tolist()
+    result_T = [list(x) for x in zip(*result_list)]
+    SS = StandardScaler().fit(result_T)
+    scaled = SS.transform(result_T)
+    result_scaled = [list(x) for x in zip(*scaled)]
+    return result_scaled
 
 def Robust(data):
     RS = RobustScaler().fit(data)
