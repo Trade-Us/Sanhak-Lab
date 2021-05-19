@@ -151,7 +151,6 @@ app.layout = html.Div(
 
                         # 군집화 결과 그래프 컴포넌트
                         html.Div([
-                            html.Div(id='hidden-result-box', style={'display':'none'}),
                             html.Div([html.Div("CLUSTERING REPORT")], className='textTitle'),
                             html.Hr(),
                             html.Div([
@@ -428,7 +427,6 @@ def store_normalization_param(method):
 # timeSeriesSample + kmeans
 @app.callback(
     Output("hidden-ts-sample-kmeans", "children"),
-    Output("hidden-result-box", 'children'),
     Input("learn-button", "n_clicks"),
     State("store-kmeans-param", 'data'),
     State("partitioning-column-data", 'value'),
@@ -458,7 +456,7 @@ def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
 
     cluster = kmeans(result_,km_data[0]['number_of_cluster'] , km_data[0]['tolerance'],km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
 
-    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG, origin_data
+    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG, origin_data, execution
     origin_data = []
     # 결과 데이터
     GG = []
@@ -477,20 +475,14 @@ def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
     siluet_score = plotSilhouette(result_ ,cluster)
     labels = cluster.labels_
     print(labels)
-    # GG = [[] ] * num_cluster
-    
     for i in range(num_cluster):
         GG.append([])
     list_value = result.values.tolist()
     for i in range(len(labels)):
         GG[labels[i]].append(list_value[i])
-    print(np.shape(GG))
     num_tsdatas_per_cluster = [len(ts_data) for ts_data in GG]
-    print(num_tsdatas_per_cluster)
-    for g in GG:
-        print(np.shape(GG))
-    return [], [html.Label('data in!!')]
-
+    execution = True
+    return 0
 # timeSeriesSample + hierarchy
 @app.callback(
     Output("hidden-ts-sample-hierarchy", "children"),
@@ -503,8 +495,7 @@ def exct_ts_sample_hierarchy(n_clicks, hrc_data):
     return []
 # rp-ae-kmeans
 @app.callback(
-    Output("hidden-rp-ae-kmeans", "children"),
-    Output("hidden-rp-ae-result-box", 'children'),
+    Output("hidden-rp-ae-kmeans", 'children'),
     Input("learn-button", "n_clicks"),
     State("store-rp-param", 'data'),
     State("store-autoencoder-param", 'data'),
@@ -539,13 +530,12 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     #(242,28,28)
     X = toRPdata(result_,rp_data[0]['dimension'],rp_data[0]['time_delay'],threshold,rp_data[0]['percentage'] / 100)
     X_expand = np.expand_dims(X,axis=3)
-    print(X_expand.shape)
+
     all_feature = fit_autoencoder(X_expand,rp_data[0]['image_size'],ae_data[0]['dimension_feature'],ae_data[0]['optimizer'],(3e-7) * (10**ae_data[0]['learning_rate']),ae_data[0]['activation_function'],ae_data[0]['loss_function'],ae_data[0]['batch_size'],ae_data[0]['epoch'])
-    print(all_feature.shape)
-    print(all_feature)
+    print('feature shape' + all_feature.shape)
     cluster = kmeans(all_feature, km_data[0]['number_of_cluster'] , km_data[0]['tolerance'], km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
 
-    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG, origin_data
+    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG, origin_data, execution
     origin_data = []
     # 결과 데이터
     GG = []
@@ -563,14 +553,15 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     used_algorithm = 'RP Autoencoder & Kmeans'# 사용한 알고리즘 적용
     siluet_score = plotSilhouette(result_resample.reshape(result_resample.shape[0], rp_data[0]['image_size']) ,cluster)
     labels = cluster.labels_
+    print(labels)
     for i in range(num_cluster):
         GG.append([])
     list_value = result.values.tolist()
     for i in range(len(labels)):
         GG[labels[i]].append(list_value[i])
     num_tsdatas_per_cluster = [len(ts_data) for ts_data in GG]
-
-    return [], 'load'
+    execution = True
+    return 0
 # rp-ae-hierarchy
 @app.callback(
     Output("hidden-rp-ae-hierarchy", "children"),
@@ -721,18 +712,22 @@ def exct_wavelet_dbscan(n_clicks, wav_data, dbs_data):
     print(wav_data)
     print(dbs_data)
     return []
-
+import time
 @app.callback(
     Output("text-result", 'children'),
     Output("graph-cluster-result", 'children'),
     Output("graph-result", 'children'),
     Output("detail-graph-option", 'children'),
-    Input("hidden-result-box", 'children'),
-    Input("hidden-rp-ae-result-box", 'children'),
+    Input("learn-button", "n_clicks"),
     prevent_initial_call=True 
 )
-def show_result(change1, change2):
-    # , pca_show()·/
+def show_result1(change):
+    global execution
+    while not execution:
+        print('실행 중...')
+        time.sleep(2)
+    print("완료")
+    execution = False
     return textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm),\
     pca_show(origin_data, labels, num_cluster),\
     graphCluster(GG),\
@@ -740,6 +735,7 @@ def show_result(change1, change2):
 # 학습 버튼을 클릭 하게 되면, i
 # Main
 if __name__ == "__main__":
+    execution = False
     # 본 데이터
     origin_data = []
     # 결과 데이터
@@ -753,4 +749,4 @@ if __name__ == "__main__":
     # 사용 알고리즘
     used_algorithm = ''
     labels = []
-    app.run_server( threaded=True)
+    app.run_server(debug=True, threaded=True)
