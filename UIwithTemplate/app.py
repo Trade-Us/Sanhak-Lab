@@ -532,7 +532,7 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     X_expand = np.expand_dims(X,axis=3)
 
     all_feature = fit_autoencoder(X_expand,rp_data[0]['image_size'],ae_data[0]['dimension_feature'],ae_data[0]['optimizer'],(3e-7) * (10**ae_data[0]['learning_rate']),ae_data[0]['activation_function'],ae_data[0]['loss_function'],ae_data[0]['batch_size'],ae_data[0]['epoch'])
-    print('feature shape' + all_feature.shape)
+    print(f'feature shape{all_feature.shape}')
     cluster = kmeans(all_feature, km_data[0]['number_of_cluster'] , km_data[0]['tolerance'], km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
 
     global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG, origin_data, execution
