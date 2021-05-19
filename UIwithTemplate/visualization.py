@@ -63,7 +63,7 @@ def pca_show(origin_data, labels, num_cluster):
     for i in range(0,num_cluster):
         fig.add_trace(go.Scatter(
             x=[dt[0] for dt in data_np[i]], y= [dt[1] for dt in data_np[i]],
-            mode='markers', name='cluster'+str(i)
+            mode='markers', name='Cluster'+str(i+1)
             )
         )
     graph = html.Div(style={}, children=[

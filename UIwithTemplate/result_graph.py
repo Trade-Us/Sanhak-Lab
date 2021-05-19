@@ -24,12 +24,13 @@ def makeGraph_dictionary(graph, n, label, color):
         fig.add_trace(go.Scatter(y=df[i], name=label[i], line=dict(color=color)))
 
     return fig
-
+import math
 def makeGraph_Cluster(graph, color):                    
     
     fig = go.Figure()
     for i in range(0, len(graph)):
-        fig.add_trace(go.Scatter(y=graph[i],  line=dict(color=color), showlegend=False))
+        new_graph = [x for x in graph[i] if math.isnan(x) == False]
+        fig.add_trace(go.Scatter(y=new_graph,  line=dict(color=color), showlegend=False))
     return fig
     
 # figure: makeGraph()를 이용해 만든 그래프
@@ -41,8 +42,8 @@ def updateLayout(figure, name, yaxis='value'):
     )
 
 def makeGraph_Detail(graph, color):                    
-    
-    fig = go.Figure(data=go.Scatter(y=graph,  line=dict(color=color)))
+    new_graph = [x for x in graph if math.isnan(x) == False]
+    fig = go.Figure(data=go.Scatter(y=new_graph,  line=dict(color=color)))
     return fig
     
 # figure: makeGraph()를 이용해 만든 그래프
@@ -65,15 +66,19 @@ colors = {
 def graphCluster(GG):
     figs=[]
     for i in range(0,len(GG)):
-        figs.append(makeGraph_Cluster(GG[i], 'teal'))
+        figs.append(makeGraph_Cluster(GG[i],'teal'))
         updateLayout(figs[i], 'cluster'+str(i))
+    # new_fig = go.Figure()
+    # for i, fig in enumerate(figs):
+    #     new_fig.add_trace(fig, row= (i//3) + 1, col=(i%3)+1)
     graph = html.Div(style={ }, children=[
         html.Div(["CLUSTERS"], className='subtitle'),
-        html.Div(
-            [html.Div(
+        html.Div([
+            html.Div(
                 dcc.Graph(id=f'GC{i}', figure=fig), 
                 className='graph graph-hover'
                 ) for i, fig in enumerate(figs)
+            # html.Div(dcc.Graph(id='GC1', figure=new_fig), className='graph graph-hover')
             ], className='graphdiv'
         )
     ], className='clusters')
@@ -84,7 +89,7 @@ def graphDetail(nth_cluster, num_graph, GG):
     figs=[]
     for i in range(0, num_graph):
         figs.append(makeGraph_Detail(GG[nth_cluster][i], 'firebrick'))
-        updateLayout(figs[i], 'Cluster0_randomData'+str(i))
+        updateLayout(figs[i], 'Cluster'+str(nth_cluster)+' '+str(i))
 
     graph = html.Div(style={'height': "500px"}, children=[
         html.Div(
@@ -116,17 +121,19 @@ def graphBig(nth_cluster, num_graph, GG):
 
     return graph
 
-def textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm):
+def textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, total_time=30):
     textdata = html.Div(children=[
         html.Div(["SUMMARIZATION"], className='subtitle'),
         html.Div([
+            html.Div(children=f'사용된 알고리즘 : {used_algorithm}'),
+            html.Hr(),
             html.Div(children=f'군집 개수 : {num_cluster}개'),
             html.Hr(),
             html.Div(children=f'군집별 데이터 개수 : {num_tsdatas_per_cluster}'),
             html.Hr(),
             html.Div(children=f'실루엣 점수 : {siluet_score}'),
             html.Hr(),
-            html.Div(children=f'사용된 알고리즘 : {used_algorithm}'),
+            html.Div(children=f'총 소요시간 : {total_time}s(초)'),
             html.Hr(),
         ], className='textbox')
     ])

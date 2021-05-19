@@ -106,12 +106,14 @@ app.layout = html.Div(
                                 ],
                         value='ts_sample_kmeans'),
                     html.Div(id='hidden-columns', style={'display':'none'}),
-                    html.Label('시계열 데이터 셋을 구분하는 column을 설정해주세요. (1개 이상)'),
+                    html.Hr(),
+                    html.H4('csv file Attributes'),
+                    html.H6('시계열 데이터 셋을 구분하는 column을 설정해주세요. (1개 이상)'),
                     dcc.Dropdown(
                         id='partitioning-column-data',
                         multi=True
                     ),
-                    html.Label('데이터의 값을 나타내는 column을 설정해주세요. (1개)'),
+                    html.H6('데이터의 값을 나타내는 column을 설정해주세요. (1개)'),
                     dcc.Dropdown(
                         id='main-ts-data'
                     ),
@@ -178,6 +180,7 @@ app.layout = html.Div(
         # 하단/ 군집화 세부적 결과 그래프 (크게보기, 하나씩 보기)
         html.Div(
             [
+                html.Div(['Graph View'],className='subtitle'),
                 # 세부적 결과 그래프 컴포넌트
                 html.Div(
                     id='detail-graph-output'
@@ -429,13 +432,15 @@ def store_normalization_param(method):
     Output("hidden-ts-sample-kmeans", "children"),
     Input("learn-button", "n_clicks"),
     State("store-kmeans-param", 'data'),
+    State("store-ts-resampler-param", "data"),
     State("partitioning-column-data", 'value'),
     State('main-ts-data', 'value'),
     State('normalization-method', 'value'),
     prevent_initial_call=True 
 )
-def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
+def exct_ts_sample_kmeans(n_clicks, km_data, tsre_data, parti_columns, value, normalize):
     print(km_data)
+    print(tsre_data)
     print(parti_columns)
     print(value)
     print(normalize)
@@ -445,7 +450,8 @@ def exct_ts_sample_kmeans(n_clicks, km_data, parti_columns, value, normalize):
     df = df.loc[:,parti_columns + value_]
     result = split_into_values(df, parti_columns)
     min=result.dropna(axis='columns')
-    min_len=len(min.columns)
+    min_len = len(min.columns) if tsre_data[0]['dimension'] is None else tsre_data[0]['dimension']
+    print(min_len)
     if normalize == "MMS":
         result_nom = MinMax(result)
     result_ = exec_ts_resampler(result_nom,min_len)
@@ -719,9 +725,11 @@ import time
     Output("graph-result", 'children'),
     Output("detail-graph-option", 'children'),
     Input("learn-button", "n_clicks"),
+    # input
     prevent_initial_call=True 
 )
 def show_result1(change):
+
     global execution
     while not execution:
         print('실행 중...')
