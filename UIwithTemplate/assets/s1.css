@@ -81,7 +81,7 @@
     width: 22%;
   }
   .four.columns {
-    width: 25.6666666667%;
+    width: 28.6666666667%;
   }
   .five.columns {
     width: 39.3333333333%;
@@ -93,7 +93,7 @@
     width: 96%;
   }
   .eight.columns {
-    width: 73.3333333333%;
+    width: 71.3333333333%;
   }
   .nine.columns {
     width: 74%;
@@ -211,7 +211,7 @@ h6 {
   font-weight: 300;
 }
 h1 {
-  font-size: 4.5rem;
+  font-size: 4rem;
   line-height: 1.2;
   letter-spacing: -0.1rem;
   margin-bottom: 2rem;
@@ -771,7 +771,6 @@ there.
 
 .textTitle{
   text-align: center;
-  /* font-family: 'Trocchi', serif;  */
   font-size: 40px; 
   font-weight: bold; 
   color:#868686;
@@ -779,7 +778,6 @@ there.
 }
 
 .subtitle{
-  /* font-family: 'Trocchi', serif;  */
   font-size: 30px; 
   font-weight: bold;
   color: #a0a0a0;
@@ -832,6 +830,23 @@ there.
 
 /* parameter css */
 #main-cluster-algorithm{
-  margin: 10px;
-  font-size: inherit;
+  width: 90%;
+  border: 5px solid #e1e1e1;
+}
+.twodiv{
+  display: inline-block;
+  width: 48%;
+  /* margin-right:10px ; */
+  vertical-align: top;
+}
+#dbscan-min-sample,
+#dbscan-epsilon,
+#autoencoder-epoch,
+#autoencoder-loss-function,
+#autoencoder-optimizer,
+#iteration-make-half-dim,
+#wavelet-function,
+#linkage,
+#n-init{
+  width: 90%;
 }

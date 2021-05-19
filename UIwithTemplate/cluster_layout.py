@@ -28,10 +28,14 @@ def dbscan_layout():
     return html.Div(id='dbscan-param', children=[
         dcc.Store(id='store-dbscan-param', data=[]),
         html.H4("DBSCAN Parameters"),
-        html.H6('Epsilon 크기'),
-        dcc.Input(id='dbscan-epsilon', min=0, max=1, value=0.5, type='number'),
-        html.H6('min-sample 크기(정수)'),
-        dcc.Input(id='dbscan-min-sample', min=1, value=5, type='number'),
+        html.Div([
+            html.H6('Epsilon 크기'),
+            dcc.Input(id='dbscan-epsilon', min=0, max=1, value=0.5, type='number'),
+        ],className='twodiv'),
+        html.Div([
+            html.H6('min-sample 크기(정수)'),
+            dcc.Input(id='dbscan-min-sample', min=1, value=5, type='number'),
+        ],className='twodiv'),
         html.Hr()
     ])
 def hierarchy_layout():
@@ -40,15 +44,18 @@ def hierarchy_layout():
         html.H4("Hierarchy Parameters"),
         html.H6('Cluster 개수'),
         dcc.Input(id='number-of-cluster', min=2, value=2, type='number'),
-        html.H6('n-init'),
-        dcc.Input(id='try-n-init', min=1, value=10, type='number'),
-        html.H6('linkage'),
-        dcc.Dropdown(
-            id='linkage',
-            options=[
-                {'label': 'ward', 'value': 'ward'}
-            ],
-            value='ward'),
+        html.Div([
+            html.H6('n-init'),
+            dcc.Input(id='try-n-init', min=1, value=10, type='number'),
+        ], className='twodiv'),
+        html.Div([
+            html.H6('linkage'),
+            dcc.Dropdown(
+                id='linkage',
+                options=[
+                    {'label': 'ward', 'value': 'ward'}
+                ],value='ward'),
+        ], className='twodiv'),
         html.Hr()
     ])
 def time_sereies_kmeans_layout():

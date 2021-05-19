@@ -8,7 +8,11 @@ def rp_layout():
         html.H4("RP Parameters"),
         html.H6("Image Size"),
         html.Label("생성할 이미지 크기 결정"),
-        dcc.Input(id='image-size', value=28, min=28, type='number'),
+        dcc.RadioItems(id='image-size', 
+            options=[
+                {'label': '28', 'value': 28},
+                {'label': '96', 'value': 96},
+            ], value=28),
         html.H6("Dimension"),
         html.Label("RP 궤적의 차원수를 결정한다. 공간 궤적 좌표 생성에 쓰이는 데이터 개수이다."),
         dcc.Input(id='dimension', value=1, min=1, type='number'),
@@ -37,8 +41,11 @@ def gaf_layout():
         html.H4("GAF Parameters"),
         html.H6("Image Size"),
         html.Label("생성할 이미지 크기 결정"),
-        dcc.Input(id='image-size', value=2, min=2, type='number'),
-
+        dcc.RadioItems(id='image-size', 
+            options=[
+                {'label': '28', 'value': 28},
+                {'label': '96', 'value': 96},
+            ], value=28),
         html.H6("method"),
         html.Label("GAF Summation vs GAF Difference"),
         dcc.Dropdown(id='gaf-method',
@@ -55,8 +62,11 @@ def mtf_layout():
         html.H4("MTF Parameters"),
         html.H6("Image Size"),
         html.Label("생성할 이미지 크기 결정"),
-        dcc.Input(id='image-size', value=2, min=2, type='number'),
-
+        dcc.RadioItems(id='image-size', 
+            options=[
+                {'label': '28', 'value': 28},
+                {'label': '96', 'value': 96},
+            ], value=28),
         html.H6("Bins"),
         html.Label("number of bins (size of alphabet)"),
         dcc.Input(id='mtf-n-bins', value=5, min=2, max=10, type='number'),
