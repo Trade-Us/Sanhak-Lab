@@ -75,7 +75,7 @@ def timeseries_resampler_layout():
         dcc.Store(id='store-ts-resampler-param', data=[]),
         html.H4("Timeseries Resampler Parameters"),
         html.H6('Dimension to reduce your ts data'),
-        dcc.Input(id='ts-resampler-dim', min=2, type='number'),
+        dcc.Input(id='ts-resampler-dim', min=2, type='number', value=2),
         html.Hr()
 
     ])

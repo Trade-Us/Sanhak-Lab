@@ -67,7 +67,7 @@ def graphCluster(GG):
     figs=[]
     for i in range(0,len(GG)):
         figs.append(makeGraph_Cluster(GG[i],'teal'))
-        updateLayout(figs[i], 'cluster'+str(i))
+        updateLayout(figs[i], 'Cluster'+str(i+1))
     # new_fig = go.Figure()
     # for i, fig in enumerate(figs):
     #     new_fig.add_trace(fig, row= (i//3) + 1, col=(i%3)+1)
@@ -89,7 +89,7 @@ def graphDetail(nth_cluster, num_graph, GG):
     figs=[]
     for i in range(0, num_graph):
         figs.append(makeGraph_Detail(GG[nth_cluster][i], 'firebrick'))
-        updateLayout(figs[i], 'Cluster'+str(nth_cluster)+' '+str(i))
+        updateLayout(figs[i], 'Cluster'+str(nth_cluster+1)+' '+str(i+1))
 
     graph = html.Div(style={'height': "500px"}, children=[
         html.Div(
