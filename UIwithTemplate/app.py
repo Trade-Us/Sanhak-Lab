@@ -730,13 +730,16 @@ import time
 )
 def show_result1(change):
 
-    global execution
+    global execution, total_time
     while not execution:
         print('실행 중...')
         time.sleep(2)
+        total_time += 2
     print("완료")
+    time = total_time
+    total_time = 0
     execution = False
-    return textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm),\
+    return textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, time),\
     pca_show(origin_data, labels, num_cluster),\
     graphCluster(GG),\
     sd.detailGraphOption(num_cluster)
@@ -757,4 +760,5 @@ if __name__ == "__main__":
     # 사용 알고리즘
     used_algorithm = ''
     labels = []
+    total_time = 0
     app.run_server(debug=True, threaded=True)
