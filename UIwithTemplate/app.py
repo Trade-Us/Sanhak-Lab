@@ -736,10 +736,10 @@ def show_result1(change):
         time.sleep(2)
         total_time += 2
     print("완료")
-    time = total_time
+    time_ = total_time
     total_time = 0
     execution = False
-    return textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, time),\
+    return textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, time_),\
     pca_show(origin_data, labels, num_cluster),\
     graphCluster(GG),\
     sd.detailGraphOption(num_cluster)
