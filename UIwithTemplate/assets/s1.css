@@ -195,7 +195,8 @@ body {
   font-weight: 400;
   font-family: "Open Sans", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial,
     sans-serif;
-  color: rgb(50, 50, 50);
+  color: #868686;
+
 }
 
 /* Typography
@@ -215,6 +216,8 @@ h1 {
   line-height: 1.2;
   letter-spacing: -0.1rem;
   margin-bottom: 2rem;
+  font-weight: bold; 
+  color:#868686;
 }
 h2 {
   font-size: 3.6rem;
@@ -729,6 +732,7 @@ there.
 
 .marginleft{
   margin-left: 4%;
+  margin-right: 10%;
 }
 .floatright{
   float: right;
@@ -771,7 +775,7 @@ there.
 
 .textTitle{
   text-align: center;
-  font-size: 40px; 
+  font-size: 30px; 
   font-weight: bold; 
   color:#868686;
   margin: 0;

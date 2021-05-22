@@ -5,6 +5,7 @@ import dash_core_components as dcc
 def detailGraphOption(num_cluster):
     return [
         html.H4('Options'),
+        html.Br(),
         html.H6("군집 선택"),
         dcc.RadioItems(id="nth-cluster",
         options=[

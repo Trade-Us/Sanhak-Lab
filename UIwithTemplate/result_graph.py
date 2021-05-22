@@ -106,7 +106,7 @@ def graphDetail(nth_cluster, num_graph, GG):
 def graphBig(nth_cluster, num_graph, GG):
     fig = []
     fig.append(makeGraph_Cluster(GG[nth_cluster][:num_graph], 'teal'))
-    updateLayout(fig[0], 'cluster'+str(nth_cluster))
+    updateLayout(fig[0], 'cluster'+str(nth_cluster+1))
 
     graph = html.Div(style={}, children=[
         html.Div(
