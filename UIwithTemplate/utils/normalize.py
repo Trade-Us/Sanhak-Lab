@@ -19,15 +19,23 @@ def Standard(data):
     return result_scaled
 
 def Robust(data):
-    RS = RobustScaler().fit(data)
-    scaled = RS.transform(data)
-    return scaled
+    result_list = data.values.tolist()
+    result_T = [list(x) for x in zip(*result_list)]
+    RS = RobustScaler().fit(result_T)
+    scaled = RS.transform(result_T)
+    result_scaled = [list(x) for x in zip(*scaled)]
+    return result_scaled
 
 def MaxAbsScaler(data):
-    MAS = MaxAbsScaler().fit(data)
-    scaled = MAS.transform(data)
-    return scaled
+    result_list = data.values.tolist()
+    result_T = [list(x) for x in zip(*result_list)]
+    MAS = MaxAbsScaler().fit(result_T)
+    scaled = MAS.transform(result_T)
+    result_scaled = [list(x) for x in zip(*scaled)]
+    return result_scaled
 
 def tsleanr_scaler(data):
-    TSS = TimeSeriesScalerMeanVariance().fit(data)
-    scaled = TSS.transform(data)
+    result_list = data.values.tolist()
+    TSS = TimeSeriesScalerMeanVariance().fit(result_list)
+    scaled = TSS.transform(result_list)
+    return scaled

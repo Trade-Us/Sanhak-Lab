@@ -17,8 +17,14 @@ def ts_sample_hierarchy():
         timeseries_resampler_layout(),
         hierarchy_layout()
     ])
+def ts_sample_dbscan():
+    return html.Div(id='ts-sample-dbscan', children=[
+        html.Div(id='hidden-ts-sample-dbscan', style={'display':'none'}),
+        timeseries_resampler_layout(),
+        dbscan_layout()
+    ])
 def ts_sample_ts_kmeans():
-    return html.Div(id='ts-sample-ts-kmeans', children=[
+    return html.Div(id='ts-sample-kmeans', children=[
         html.Div(id='hidden-ts-sample-ts-kmeans', style={'display':'none'}),
         timeseries_resampler_layout(),
         time_sereies_kmeans_layout()
@@ -93,7 +99,7 @@ def wavelet_kmeans():
     return html.Div(id='wavelet-kmeans', children=[
         html.Div(id='hidden-wavelet-dbscan', style={'display':'none'}),
         wavelet_layout(),
-        dbscan_layout()
+        kmeans_layout()
     ])
 def wavelet_hierarchy():
     return html.Div(id='wavelet-hierarchy', children=[
@@ -105,5 +111,5 @@ def wavelet_dbscan():
     return html.Div(id='wavelet-dbscan', children=[
         html.Div(id='hidden-wavelet-dbscan', style={'display':'none'}),
         wavelet_layout(),
-        dbscan_layout()
+        hierarchy_layout()
     ])

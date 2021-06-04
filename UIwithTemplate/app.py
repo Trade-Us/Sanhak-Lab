@@ -1,3 +1,4 @@
+from clusters import ts_sample_dbscan
 import dash
 from dash.dependencies import Input, Output, State, ClientsideFunction
 import dash_core_components as dcc
@@ -40,10 +41,10 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.Img(
-                            src=app.get_asset_url("dash-logo.png"),
+                            src=app.get_asset_url("1234logo.png"),
                             id="plotly-image",
                             style={
-                                "height": "60px",
+                                "height": "100px",
                                 "width": "auto",
                                 "margin-bottom": "25px",
                             },
@@ -90,6 +91,7 @@ app.layout = html.Div(
                         options=[
                                     {'label': 'TimeSeriesSample + KMeans', 'value':'ts_sample_kmeans'},
                                     {'label': 'TimeSeriesSample + Hierarchical Cluster', 'value':'ts_sample_hierarchy'},
+                                    {'label': 'TimeSeriesSample + DBSCAN Cluster', 'value':'ts_sample_dbscan'},
                                     {'label': 'TimeSeriesSample + TimeSeriesKMeans', 'value':'ts_sample_ts_kmeans'},
                                     {'label': 'RP + Autoencoder + Kmeans', 'value':'rp_ae_kmeans'},
                                     {'label': 'RP + Autoencoder + Hierarchical Cluster', 'value':'rp_ae_hierarchy'},
@@ -255,6 +257,8 @@ def select_main_algorithm(algorithm):
         return ts_sample_kmeans()
     elif algorithm == 'ts_sample_hierarchy':
         return ts_sample_hierarchy()
+    elif algorithm == 'ts_sample_dbscan':
+        return ts_sample_dbscan()
     elif algorithm == 'ts_sample_ts_kmeans':
         return ts_sample_ts_kmeans()
     elif algorithm == 'rp_ae_kmeans':
@@ -426,42 +430,8 @@ def store_normalization_param(method):
     data = df.to_dict('records')
     return data
 #######################################################################
-## 군집화 알고리즘 별 파라미터 호출
-# timeSeriesSample + kmeans
-@app.callback(
-    Output("hidden-ts-sample-kmeans", "children"),
-    Input("learn-button", "n_clicks"),
-    State("store-kmeans-param", 'data'),
-    State("store-ts-resampler-param", "data"),
-    State("partitioning-column-data", 'value'),
-    State('main-ts-data', 'value'),
-    State('normalization-method', 'value'),
-    prevent_initial_call=True 
-)
-def exct_ts_sample_kmeans(n_clicks, km_data, tsre_data, parti_columns, value, normalize):
-    print(km_data)
-    print(tsre_data)
-    print(parti_columns)
-    print(value)
-    print(normalize)
-
-    df = pd.read_csv('.\\data\\saved_data.csv')
-    value_ = [value]
-    df = df.loc[:,parti_columns + value_]
-    result = split_into_values(df, parti_columns)
-    min=result.dropna(axis='columns')
-    min_len = len(min.columns) if tsre_data[0]['dimension'] is None else tsre_data[0]['dimension']
-    print(min_len)
-    if normalize == "MMS":
-        result_nom = MinMax(result)
-    result_ = exec_ts_resampler(result_nom,min_len)
-    result_ = result_.reshape(result_.shape[0],min_len)
-    print(result_.shape)
-    
-    # print(result.labels_)
-
-    cluster = kmeans(result_,km_data[0]['number_of_cluster'] , km_data[0]['tolerance'],km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
-
+# 원본데이터(DataType), 군집 개수, 사용한 알고리즘(String), 군집 결과 라벨, 특징추출된 데이터
+def send_result_data(origin_data_, num_cluster_, used_algorithm_, labels_, featured_data_):
     global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG, origin_data, execution
     origin_data = []
     # 결과 데이터
@@ -475,29 +445,89 @@ def exct_ts_sample_kmeans(n_clicks, km_data, tsre_data, parti_columns, value, no
     # 사용 알고리즘
     used_algorithm = ''
     labels = []
-    origin_data = result
-    num_cluster = km_data[0]['number_of_cluster']
-    used_algorithm = 'Time Series Resampler & Kmeans'# 사용한 알고리즘 적용
-    siluet_score = plotSilhouette(result_ ,cluster)
-    labels = cluster.labels_
-    print(labels)
-    for i in range(num_cluster):
+
+    origin_data = origin_data_ # 원본 데이터 type=DataFrame
+    num_cluster = num_cluster_ # 군집 개수
+    used_algorithm = used_algorithm_# 사용한 알고리즘 적용
+    labels = labels_ # 군집화 결과 라벨링
+    siluet_score = plotSilhouette(featured_data_ ,labels_) # 실루엣 계산 (차원 축소한 데이터, 라벨)
+    # 군집별 3차원 데이터 생성
+    for i in range(num_cluster_):
         GG.append([])
-    list_value = result.values.tolist()
-    for i in range(len(labels)):
-        GG[labels[i]].append(list_value[i])
-    num_tsdatas_per_cluster = [len(ts_data) for ts_data in GG]
-    execution = True
+    list_value = origin_data_.values.tolist() # 원본데이터
+    for i in range(len(labels_)):
+        GG[labels_[i]].append(list_value[i])
+    num_tsdatas_per_cluster = [len(ts_data) for ts_data in GG] # 클러스터 당 시계열 데이터 개수
+    execution = True # 실행 완료 flag
+    print("실행중")
+def set_normalize(origin_data_, normalize):
+    if normalize == "MMS":
+        result_nom = MinMax(origin_data_)
+    elif normalize == "SSC":
+        result_nom = Standard(origin_data_)
+    elif normalize == "RBS":
+        result_nom = Robust(origin_data_)
+    elif normalize == "MAS":
+        result_nom = MaxAbsScaler(origin_data_)
+    elif normalize == "TSS":
+        result_nom = tsleanr_scaler(origin_data_)
+    return result_nom
+## 군집화 알고리즘 별 파라미터 호출
+# timeSeriesSample + kmeans
+@app.callback(
+    Output("hidden-ts-sample-kmeans", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-kmeans-param", 'data'),
+    State("store-ts-resampler-param", "data"),
+    State("partitioning-column-data", 'value'),
+    State('main-ts-data', 'value'),
+    State('normalization-method', 'value'),
+    prevent_initial_call=True 
+)
+def exct_ts_sample_kmeans(n_clicks, km_data, tsre_data, parti_columns, value, normalize):
+    print("Time Series Resampler & Kmeans 중 입니다...")
+
+    df = pd.read_csv('.\\data\\saved_data.csv')
+    value_ = [value]
+    df = df.loc[:,parti_columns + value_]
+    result = split_into_values(df, parti_columns)
+    min=result.dropna(axis='columns')
+    min_len = len(min.columns) if tsre_data[0]['dimension'] is None else tsre_data[0]['dimension']
+    result_nom = set_normalize(result, normalize)
+    result_ = exec_ts_resampler(result_nom,min_len)
+    result_ = result_.reshape(result_.shape[0],min_len)
+
+    cluster = kmeans(result_,km_data[0]['number_of_cluster'] , km_data[0]['tolerance'],km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
+    send_result_data(result, km_data[0]['number_of_cluster'], "Time Series Resampler & Kmeans", cluster.labels_, result_)
+
     return 0
 # timeSeriesSample + hierarchy
 @app.callback(
     Output("hidden-ts-sample-hierarchy", "children"),
     Input("learn-button", "n_clicks"),
     State("store-hierarchy-param", 'data'),
+    State("store-ts-resampler-param", "data"),
+    State("partitioning-column-data", 'value'),
+    State('main-ts-data', 'value'),
+    State('normalization-method', 'value'),
     prevent_initial_call=True 
 )
 def exct_ts_sample_hierarchy(n_clicks, hrc_data):
     print(hrc_data)
+    return []
+# timeSeriesSample + DBSCAN
+@app.callback(
+    Output("hidden-ts-sample-dbscan", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-dbscan-param", 'data'),
+    State("store-ts-resampler-param", "data"),
+    State("partitioning-column-data", 'value'),
+    State('main-ts-data', 'value'),
+    State('normalization-method', 'value'),
+    prevent_initial_call=True 
+)
+def exct_ts_sample_dbscan(n_clicks, dbs_data):
+    print(dbs_data)
     return []
 # rp-ae-kmeans
 @app.callback(
@@ -512,12 +542,7 @@ def exct_ts_sample_hierarchy(n_clicks, hrc_data):
     prevent_initial_call=True 
 )
 def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_columns, value, normalize):
-    print(rp_data)
-    print(ae_data)
-    print(km_data)
-    print(parti_columns)
-    print(value)
-    print(normalize)
+    print("RP Autoencoder & Kmeans 실행중입니다...")
     threshold = rp_data[0]['threshold']
     if threshold == 'None':
         threshold = None
@@ -527,10 +552,9 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     df = df.loc[:,parti_columns + value_]
     result = split_into_values(df, parti_columns)
     min=result.dropna(axis='columns')
-    min_len=len(min.columns)
-    if normalize == "MMS":
-        result_nom = MinMax(result)
-    result_resample = exec_ts_resampler(result_nom,rp_data[0]['image_size'])
+
+    result_nom = set_normalize(result, normalize)
+    result_resample = exec_ts_resampler(result_nom, rp_data[0]['image_size'])
     #(242,28,1)
     result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
     #(242,28,28)
@@ -541,32 +565,7 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     print(f'feature shape{all_feature.shape}')
     cluster = kmeans(all_feature, km_data[0]['number_of_cluster'] , km_data[0]['tolerance'], km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
 
-    global num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, labels, GG, origin_data, execution
-    origin_data = []
-    # 결과 데이터
-    GG = []
-    # 클러스터 개수
-    num_cluster = 0
-    # 클러스터 당 시계열 데이터 개수
-    num_tsdatas_per_cluster = []
-    # 실루엣 점수
-    siluet_score = 0
-    # 사용 알고리즘
-    used_algorithm = ''
-    labels = []
-    origin_data = result
-    num_cluster = km_data[0]['number_of_cluster']
-    used_algorithm = 'RP Autoencoder & Kmeans'# 사용한 알고리즘 적용
-    siluet_score = plotSilhouette(result_resample.reshape(result_resample.shape[0], rp_data[0]['image_size']) ,cluster)
-    labels = cluster.labels_
-    print(labels)
-    for i in range(num_cluster):
-        GG.append([])
-    list_value = result.values.tolist()
-    for i in range(len(labels)):
-        GG[labels[i]].append(list_value[i])
-    num_tsdatas_per_cluster = [len(ts_data) for ts_data in GG]
-    execution = True
+    send_result_data(result, km_data[0]['number_of_cluster'], "RP Autoencoder & Kmeans", cluster.labels_, all_feature)
     return 0
 # rp-ae-hierarchy
 @app.callback(

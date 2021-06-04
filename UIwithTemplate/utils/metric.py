@@ -12,6 +12,6 @@ def getAccuracy(data_y, pred_y):
             count += 1
     return count / pred_y.size
 
-def plotSilhouette(X, y_km):
-    silhouette_vals = silhouette_score(X, y_km.labels_,metric='euclidean')
+def plotSilhouette(X, labels):
+    silhouette_vals = silhouette_score(X, labels ,metric='euclidean')
     return silhouette_vals

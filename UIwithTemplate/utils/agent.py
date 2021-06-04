@@ -18,7 +18,7 @@ class Autoencoder_Agent(object):
         self.learning_rate = learning_rate
         self.dimension = dimension
         if self.model_size == 28:
-            self.model = CNNAutoEncoder_28(optimizer = optimizer, learning_rate = learning_rate, activation=activation_function, loss=loss_function)
+            self.model = CNNAutoEncoder_28(optimizer = optimizer, dimension=dimension, learning_rate = learning_rate, activation=activation_function, loss=loss_function)
             self.compressed_layer = 5
         elif self.model_size == 96: 
             self.model = CNNAutoEncoder_96(optimizer = optimizer,dimension=dimension,
