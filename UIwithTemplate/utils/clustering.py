@@ -26,9 +26,9 @@ def spectralClustering(dataset, n_clusters, n_init = 10):
     return cluster_data
 
 # Hierarchical Clustering
-def hierarchicalClustering(dataset, n_clusters, n_init = 10, linkage = 'ward'):
+def hierarchicalClustering(dataset, n_clusters, linkage = 'ward'):
 
-    cluster_data = AgglomerativeClustering(n_clusters = n_clusters, linkage = linkage, n_init=n_init ).fit(dataset)
+    cluster_data = AgglomerativeClustering(n_clusters = n_clusters, linkage = linkage).fit(dataset)
     return cluster_data
 
 

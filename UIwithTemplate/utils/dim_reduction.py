@@ -32,9 +32,14 @@ def fit_autoencoder(X, image_size, dimension, optimizer, learning_rate, activati
     
 ## wavelet
 def exec_wavelet(X, func, iter):
-    for i in range(iter):
-        data,trash = pywt.dwt(X, func)
-    return data
+    X_list = X.tolist()
+    result_list = []
+    for array in X_list:
+        for i in range(iter):
+            data,trash = pywt.dwt(array, func)
+        result_list.append(data)
+    return np.array(result_list)
+    
 
 # PCA
 

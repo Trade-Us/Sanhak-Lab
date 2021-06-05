@@ -97,13 +97,13 @@ def mtf_ae_dbscan():
 
 def wavelet_kmeans():
     return html.Div(id='wavelet-kmeans', children=[
-        html.Div(id='hidden-wavelet-dbscan', style={'display':'none'}),
+        html.Div(id='hidden-wavelet-kmeans', style={'display':'none'}),
         wavelet_layout(),
         kmeans_layout()
     ])
 def wavelet_hierarchy():
     return html.Div(id='wavelet-hierarchy', children=[
-        html.Div(id='hidden-wavelet-dbscan', style={'display':'none'}),
+        html.Div(id='hidden-wavelet-hierarchy', style={'display':'none'}),
         wavelet_layout(),
         dbscan_layout()
     ])
