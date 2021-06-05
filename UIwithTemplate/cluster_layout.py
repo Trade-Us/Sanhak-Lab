@@ -45,17 +45,13 @@ def hierarchy_layout():
         html.H6('Cluster 개수'),
         dcc.Input(id='number-of-cluster', min=2, value=2, type='number'),
         html.Div([
-            html.H6('n-init'),
-            dcc.Input(id='try-n-init', min=1, value=10, type='number'),
-        ], className='twodiv'),
-        html.Div([
             html.H6('linkage'),
             dcc.Dropdown(
                 id='linkage',
                 options=[
                     {'label': 'ward', 'value': 'ward'}
                 ],value='ward'),
-        ], className='twodiv'),
+        ]),
         html.Hr()
     ])
 def time_sereies_kmeans_layout():

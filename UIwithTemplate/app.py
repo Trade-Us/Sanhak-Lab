@@ -154,9 +154,16 @@ app.layout = html.Div(
                         ),
 
                         # 군집화 결과 그래프 컴포넌트
+
                         html.Div([
                             html.Div([html.Div("CLUSTERING REPORT")], className='textTitle'),
                             html.Hr(),
+                            dcc.Loading(
+                                id="loading-1",
+                                type="dot",
+                                children=html.Div(id="loading-output-1"),
+                                color="#868686"
+                            ),
                             html.Div([
                                 html.Div(id='text-result',
                                     # textResultDiv(), pca_show(), graphCluster(), sd.detailGraphOption(),
@@ -321,13 +328,11 @@ def store_kmeans_param(ncl, tol, tni, tnk, rc):
 @app.callback(
     Output('store-hierarchy-param', 'data'),
     Input("number-of-cluster", "value"),
-    Input("try-n-init", "value"),
     Input("linkage", "value"),
 )
-def store_hirarchy_param(ncl, tni, lnk):
+def store_hirarchy_param(ncl, lnk):
     df = pd.DataFrame()
     df['number_of_cluster'] = [ncl]
-    df['try_n_init'] = [tni]
     df['linkage'] = [lnk]
     data = df.to_dict('records')
     return data
@@ -949,6 +954,7 @@ import time
     Output("graph-cluster-result", 'children'),
     Output("graph-result", 'children'),
     Output("detail-graph-option", 'children'),
+    Output("loading-output-1", "children"),
     Input("learn-button", "n_clicks"),
     # input
     prevent_initial_call=True
@@ -967,7 +973,7 @@ def show_result1(change):
     return textResultDiv(num_cluster, num_tsdatas_per_cluster, siluet_score, used_algorithm, time_),\
     pca_show(origin_data, labels, num_cluster),\
     graphCluster(GG),\
-    sd.detailGraphOption(num_cluster)
+    sd.detailGraphOption(num_cluster), []
 # 학습 버튼을 클릭 하게 되면, i
 # Main
 if __name__ == "__main__":

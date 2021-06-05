@@ -61,7 +61,7 @@ def wavelet_layout():
         html.H4("Wavelet Parameters"),
         html.Div([
             html.H6('Wavelet Function'),
-            dcc.Input(id='wavelet-function', value='bd2'),
+            dcc.Input(id='wavelet-function', value='db2'),
         ], className='twodiv'),
         html.Div([
             html.H6('Iteration to half data'),
