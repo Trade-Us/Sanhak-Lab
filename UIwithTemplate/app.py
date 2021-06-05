@@ -974,7 +974,21 @@ def show_result1(change):
     pca_show(origin_data, labels, num_cluster),\
     graphCluster(GG),\
     sd.detailGraphOption(num_cluster), []
-# 학습 버튼을 클릭 하게 되면, i
+
+@app.callback(
+    Output("learn-button", "disabled"), # Deactivate
+    Output("learn-button", "children"), # 학습 중 텍스트 변환
+    Input("learn-button", "n_clicks"),
+    prevent_initial_call=True
+)
+def setting_learn_button(n_clicks, state):
+    print(n_clicks)
+    global check_learning
+    if n_clicks == check_learning or n_clicks is None:
+        return False, "학습 시작하기"
+    else:
+        check_learning += 1
+        return True, "학습 중입니다"
 # Main
 if __name__ == "__main__":
     execution = False
@@ -996,4 +1010,5 @@ if __name__ == "__main__":
     parti_columns = []
     value_columns = None
     normalize = ''
+    check_learning = 0
     app.run_server(debug=True, threaded=True)

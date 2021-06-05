@@ -105,11 +105,11 @@ def wavelet_hierarchy():
     return html.Div(id='wavelet-hierarchy', children=[
         html.Div(id='hidden-wavelet-hierarchy', style={'display':'none'}),
         wavelet_layout(),
-        dbscan_layout()
+        hierarchy_layout()
     ])
 def wavelet_dbscan():
     return html.Div(id='wavelet-dbscan', children=[
         html.Div(id='hidden-wavelet-dbscan', style={'display':'none'}),
         wavelet_layout(),
-        hierarchy_layout()
+        dbscan_layout()
     ])
