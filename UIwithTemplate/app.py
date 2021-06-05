@@ -215,7 +215,19 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
             parse_contents(c, n, d) for c, n, d in
             zip(list_of_contents, list_of_names, list_of_dates)]
         return result[0][0], result[0][1], result[0][1]
-
+# Save Column, Value, Normalize infomation
+@app.callback(
+    Output('hidden-columns', 'children'),
+    Input("partitioning-column-data", 'value'),
+    Input('main-ts-data', 'value'),
+    Input('normalization-method', 'value')
+)
+def save_columns_and_norm(parti_col, val, norm):
+    global parti_columns, value_columns, normalize
+    parti_columns = parti_col
+    value_columns = [val]
+    normalize = norm
+    return []
 ####                                                           ####
 # 컨트롤 컴포넌트에 의해 세부적 그래프 컴포넌트가 달라집니다. #
 ####                                                           ####
@@ -489,6 +501,13 @@ def set_normalize(origin_data_, normalize):
     elif normalize == "TSS":
         result_nom = tsleanr_scaler(origin_data_)
     return result_nom
+def initialize_data():
+    global parti_columns, value_columns, normalize
+    df = pd.read_csv('.\\data\\saved_data.csv')
+    df = df.loc[:,parti_columns + value_columns]
+    result = split_into_values(df, parti_columns)
+    result_norm = set_normalize(result, normalize)
+    return result, result_norm
 ## 군집화 알고리즘 별 파라미터 호출
 # timeSeriesSample + kmeans
 @app.callback(
@@ -496,22 +515,16 @@ def set_normalize(origin_data_, normalize):
     Input("learn-button", "n_clicks"),
     State("store-kmeans-param", 'data'),
     State("store-ts-resampler-param", "data"),
-    State("partitioning-column-data", 'value'),
-    State('main-ts-data', 'value'),
-    State('normalization-method', 'value'),
     prevent_initial_call=True
 )
-def exct_ts_sample_kmeans(n_clicks, km_data, tsre_data, parti_columns, value, normalize):
+def exct_ts_sample_kmeans(n_clicks, km_data, tsre_data):
     print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
 
-    df = pd.read_csv('.\\data\\saved_data.csv')
-    value_ = [value]
-    df = df.loc[:,parti_columns + value_]
-    result = split_into_values(df, parti_columns)
     min=result.dropna(axis='columns')
-    result_nom = set_normalize(result, normalize)
     min_len = len(min.columns) if tsre_data[0]['dimension'] is None else tsre_data[0]['dimension']
-    result_ = exec_ts_resampler(result_nom,min_len)
+    result_ = exec_ts_resampler(result_norm,min_len)
     result_ = result_.reshape(result_.shape[0],min_len)
 
     cluster = kmeans(result_,km_data[0]['number_of_cluster'] , km_data[0]['tolerance'],km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
@@ -524,13 +537,12 @@ def exct_ts_sample_kmeans(n_clicks, km_data, tsre_data, parti_columns, value, no
     Input("learn-button", "n_clicks"),
     State("store-hierarchy-param", 'data'),
     State("store-ts-resampler-param", "data"),
-    State("partitioning-column-data", 'value'),
-    State('main-ts-data', 'value'),
-    State('normalization-method', 'value'),
     prevent_initial_call=True
 )
-def exct_ts_sample_hierarchy(n_clicks, hrc_data):
-    print(hrc_data)
+def exct_ts_sample_hierarchy(n_clicks, hrc_data, tsre_data):
+    print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
     return []
 # timeSeriesSample + DBSCAN
 @app.callback(
@@ -538,33 +550,38 @@ def exct_ts_sample_hierarchy(n_clicks, hrc_data):
     Input("learn-button", "n_clicks"),
     State("store-dbscan-param", 'data'),
     State("store-ts-resampler-param", "data"),
-    State("partitioning-column-data", 'value'),
-    State('main-ts-data', 'value'),
-    State('normalization-method', 'value'),
     prevent_initial_call=True
 )
-def exct_ts_sample_dbscan(n_clicks, dbs_data):
+def exct_ts_sample_dbscan(n_clicks, dbs_data, tsre_data):
     print(dbs_data)
+    print("Time Series Resampler & Kmeans 중 입니다...")
+
+    # init
+    result, result_norm = initialize_data()
+
+    min=result.dropna(axis='columns')
+    min_len = len(min.columns) if tsre_data[0]['dimension'] is None else tsre_data[0]['dimension']
+    result_ = exec_ts_resampler(result_nom,min_len)
+    result_ = result_.reshape(result_.shape[0],min_len)
+
+    cluster = kmeans(result_,km_data[0]['number_of_cluster'] , km_data[0]['tolerance'],km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
+    send_result_data(result, km_data[0]['number_of_cluster'], "Time Series Resampler & Kmeans", cluster.labels_, result_)
     return []
+
 # TimeSeriesSample + TimeSeriesKmeans
 @app.callback(
     Output("hidden-ts-sample-ts-kmeans", "children"),
     Input("learn-button", "n_clicks"),
     State("store-tskmeans-param", 'data'),
     State("store-ts-resampler-param", "data"),
-    State("partitioning-column-data", 'value'),
-    State('main-ts-data', 'value'),
-    State('normalization-method', 'value'),
     prevent_initial_call=True
 )
-def exct_ts_sample_tskmeans(n_clikcs, tsk_data, tsre_data, parti_columns, value, normalize):
+def exct_ts_sample_tskmeans(n_clikcs, tsk_data, tsre_data):
     print("TimeSeriesResampler & TimeSeriesKMeans 실행중 입니다...")
-    df = pd.read_csv('.\\data\\saved_data.csv')
-    value_ = [value]
-    df = df.loc[:,parti_columns + value_]
-    result = split_into_values(df, parti_columns)
-    result_norm = set_normalize(result, normalize)
+    # init
+    result, result_norm = initialize_data()
 
+    min=result.dropna(axis='columns')
     min_len = len(min.columns) if tsre_data[0]['dimension'] is None else tsre_data[0]['dimension']
     result_ = exec_ts_resampler(result_norm,min_len)
     cluster = ts_kmeans_clustering(result_, tsk_data[0]['number_of_cluster'], tsk_data[0]['try_n_init'], tsk_data[0]['distance_algorithm'])
@@ -578,25 +595,18 @@ def exct_ts_sample_tskmeans(n_clikcs, tsk_data, tsre_data, parti_columns, value,
     State("store-rp-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-kmeans-param", 'data'),
-    State("partitioning-column-data", 'value'),
-    State('main-ts-data', 'value'),
-    State('normalization-method', 'value'),
     prevent_initial_call=True
 )
-def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_columns, value, normalize):
+def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data):
     print("RP Autoencoder & Kmeans 실행중입니다...")
     threshold = rp_data[0]['threshold']
     if threshold == 'None':
         threshold = None
 
-    df = pd.read_csv('.\\data\\saved_data.csv')
-    value_ = [value]
-    df = df.loc[:,parti_columns + value_]
-    result = split_into_values(df, parti_columns)
-    min=result.dropna(axis='columns')
+    # init
+    result, result_norm = initialize_data()
 
-    result_nom = set_normalize(result, normalize)
-    result_resample = exec_ts_resampler(result_nom, rp_data[0]['image_size'])
+    result_resample = exec_ts_resampler(result_norm, rp_data[0]['image_size'])
     #(242,28,1)
     result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
     #(242,28,28)
@@ -622,6 +632,9 @@ def exct_rp_autoencoder_hierarchy(n_clicks, rp_data, ae_data, hrc_data):
     print(rp_data)
     print(ae_data)
     print(hrc_data)
+    print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
     return []
 # rp-ae-dbscan
 @app.callback(
@@ -636,6 +649,9 @@ def exct_rp_autoencoder_dbscan(n_clicks, rp_data, ae_data, dbs_data):
     print(rp_data)
     print(ae_data)
     print(dbs_data)
+    print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
     return []
 
 # gaf-ae-kmeans
@@ -645,22 +661,15 @@ def exct_rp_autoencoder_dbscan(n_clicks, rp_data, ae_data, dbs_data):
     State("store-gaf-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-kmeans-param", 'data'),
-    State("partitioning-column-data", 'value'),
-    State('main-ts-data', 'value'),
-    State('normalization-method', 'value'),
     prevent_initial_call=True
 )
-def exct_gaf_autoencoder_kmeans(n_clicks, gaf_data, ae_data, km_data, parti_columns, value, normalize):
+def exct_gaf_autoencoder_kmeans(n_clicks, gaf_data, ae_data, km_data):
     print("GAF Autoencoder & Kmeans 실행중입니다...")
 
-    df = pd.read_csv('.\\data\\saved_data.csv')
-    value_ = [value]
-    df = df.loc[:,parti_columns + value_]
-    result = split_into_values(df, parti_columns)
-    min=result.dropna(axis='columns')
+    # init
+    result, result_norm = initialize_data()
 
-    result_nom = set_normalize(result, normalize)
-    result_resample = exec_ts_resampler(result_nom, gaf_data[0]['image_size'])
+    result_resample = exec_ts_resampler(result_norm, gaf_data[0]['image_size'])
     #(242,28,1)
     result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
     #(242,28,28)
@@ -686,6 +695,9 @@ def exct_gaf_autoencoder_hierarchy(n_clicks, gaf_data, ae_data, hrc_data):
     print(gaf_data)
     print(ae_data)
     print(hrc_data)
+    print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
     return []
 # gaf-ae-dbscan
 @app.callback(
@@ -700,6 +712,9 @@ def exct_gaf_autoencoder_dbscan(n_clicks, gaf_data, ae_data, dbs_data):
     print(gaf_data)
     print(ae_data)
     print(dbs_data)
+    print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
     return []
 
 # mtf-ae-kmeans
@@ -709,20 +724,13 @@ def exct_gaf_autoencoder_dbscan(n_clicks, gaf_data, ae_data, dbs_data):
     State("store-mtf-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-kmeans-param", 'data'),
-    State("partitioning-column-data", 'value'),
-    State('main-ts-data', 'value'),
-    State('normalization-method', 'value'),
     prevent_initial_call=True
 )
-def exct_mtf_autoencoder_kmeans(n_clicks, mtf_data, ae_data, km_data, parti_columns, value, normalize):
+def exct_mtf_autoencoder_kmeans(n_clicks, mtf_data, ae_data, km_data):
     print("MTF Autoencoder & Kmeans")
-    df = pd.read_csv('.\\data\\saved_data.csv')
-    value_ = [value]
-    df = df.loc[:,parti_columns + value_]
-    result = split_into_values(df, parti_columns)
-    min=result.dropna(axis='columns')
+    # init
+    result, result_norm = initialize_data()
 
-    result_nom = set_normalize(result, normalize)
     result_resample = exec_ts_resampler(result_nom, mtf_data[0]['image_size'])
     #(242,28,1)
     result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
@@ -749,6 +757,9 @@ def exct_mtf_autoencoder_hierarchy(n_clicks, mtf_data, ae_data, hrc_data):
     print(mtf_data)
     print(ae_data)
     print(hrc_data)
+    print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
     return []
 # mtf-ae-dbscan
 @app.callback(
@@ -763,6 +774,9 @@ def exct_mtf_autoencoder_dbscan(n_clicks, mtf_data, ae_data, dbs_data):
     print(mtf_data)
     print(ae_data)
     print(dbs_data)
+    print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
     return []
 # wavelet-kmeans
 @app.callback(
@@ -775,6 +789,9 @@ def exct_mtf_autoencoder_dbscan(n_clicks, mtf_data, ae_data, dbs_data):
 def exct_wavelet_kmeans(n_clicks, wav_data, kms_data):
     print(wav_data)
     print(kms_data)
+    print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
     return []
 # wavelet-hierarchy
 @app.callback(
@@ -787,6 +804,9 @@ def exct_wavelet_kmeans(n_clicks, wav_data, kms_data):
 def exct_wavelet_hierarchy(n_clicks, wav_data, hrc_data):
     print(wav_data)
     print(hrc_data)
+    print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
     return []
 # wavelet-dbscan
 @app.callback(
@@ -799,6 +819,9 @@ def exct_wavelet_hierarchy(n_clicks, wav_data, hrc_data):
 def exct_wavelet_dbscan(n_clicks, wav_data, dbs_data):
     print(wav_data)
     print(dbs_data)
+    print("Time Series Resampler & Kmeans 중 입니다...")
+    # init
+    result, result_norm = initialize_data()
     return []
 import time
 @app.callback(
@@ -843,4 +866,8 @@ if __name__ == "__main__":
     used_algorithm = ''
     labels = []
     total_time = 0
+
+    parti_columns = []
+    value_columns = None
+    normalize = ''
     app.run_server(debug=True, threaded=True)

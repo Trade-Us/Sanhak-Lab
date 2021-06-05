@@ -58,8 +58,8 @@ def pca_show(origin_data, labels, num_cluster):
         data[labels[i]].append(list_value[i])
     #그래프 그리기
     fig = go.Figure()
-    data_np = np.array(data)
-    
+    data_np = np.array(data, dtype=object)
+
     for i in range(0,num_cluster):
         fig.add_trace(go.Scatter(
             x=[dt[0] for dt in data_np[i]], y= [dt[1] for dt in data_np[i]],
