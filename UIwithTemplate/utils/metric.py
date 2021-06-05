@@ -1,4 +1,4 @@
-# 평가 지표 함수 
+# 평가 지표 함수
 import numpy as np
 from sklearn.metrics import silhouette_score
 # Accuracy를 가져오는 함수
@@ -13,5 +13,7 @@ def getAccuracy(data_y, pred_y):
     return count / pred_y.size
 
 def plotSilhouette(X, labels):
-    silhouette_vals = silhouette_score(X, labels ,metric='euclidean')
-    return silhouette_vals
+    if max(labels) > 0:
+        return silhouette_score(X, labels ,metric='euclidean')
+    else:
+        return "군집 개수 2미만으로 측정 불가"

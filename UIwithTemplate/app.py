@@ -553,19 +553,19 @@ def exct_ts_sample_hierarchy(n_clicks, hrc_data, tsre_data):
     prevent_initial_call=True
 )
 def exct_ts_sample_dbscan(n_clicks, dbs_data, tsre_data):
-    print(dbs_data)
-    print("Time Series Resampler & Kmeans 중 입니다...")
+    print("Time Series Resampler & DBSCAN 중 입니다...")
 
     # init
     result, result_norm = initialize_data()
 
     min=result.dropna(axis='columns')
     min_len = len(min.columns) if tsre_data[0]['dimension'] is None else tsre_data[0]['dimension']
-    result_ = exec_ts_resampler(result_nom,min_len)
+    result_ = exec_ts_resampler(result_norm,min_len)
     result_ = result_.reshape(result_.shape[0],min_len)
 
-    cluster = kmeans(result_,km_data[0]['number_of_cluster'] , km_data[0]['tolerance'],km_data[0]['try_n_init'],km_data[0]['try_n_kmeans'])
-    send_result_data(result, km_data[0]['number_of_cluster'], "Time Series Resampler & Kmeans", cluster.labels_, result_)
+    cluster = dbscan(result_, eps=dbs_data[0]['epsilon'], min_samples=dbs_data[0]['min_sample'])
+    cluster_num = max(cluster.labels_) + 1
+    send_result_data(result, cluster_num, "Time Series Resampler & DBSCAN ", cluster.labels_, result_)
     return []
 
 # TimeSeriesSample + TimeSeriesKmeans
@@ -614,7 +614,7 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data):
     X_expand = np.expand_dims(X,axis=3)
 
     all_feature = fit_autoencoder(X_expand,rp_data[0]['image_size'],ae_data[0]['dimension_feature'],ae_data[0]['optimizer'],(3e-7) * (10**ae_data[0]['learning_rate']),ae_data[0]['activation_function'],ae_data[0]['loss_function'],ae_data[0]['batch_size'],ae_data[0]['epoch'])
-    print(f'feature shape{all_feature.shape}')
+
     cluster = kmeans(all_feature, km_data[0]['number_of_cluster'] , km_data[0]['tolerance'], km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
 
     send_result_data(result, km_data[0]['number_of_cluster'], "RP Autoencoder & Kmeans", cluster.labels_, all_feature)
@@ -646,12 +646,26 @@ def exct_rp_autoencoder_hierarchy(n_clicks, rp_data, ae_data, hrc_data):
     prevent_initial_call=True
 )
 def exct_rp_autoencoder_dbscan(n_clicks, rp_data, ae_data, dbs_data):
-    print(rp_data)
-    print(ae_data)
-    print(dbs_data)
-    print("Time Series Resampler & Kmeans 중 입니다...")
+    print("RP Autoencoder & DBSCAN 실행중 입니다...")
+
+    threshold = rp_data[0]['threshold']
+    if threshold == 'None':
+        threshold = None
     # init
     result, result_norm = initialize_data()
+
+    result_resample = exec_ts_resampler(result_norm, rp_data[0]['image_size'])
+    #(242,28,1)
+    result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
+    #(242,28,28)
+    X = toRPdata(result_,rp_data[0]['dimension'],rp_data[0]['time_delay'],threshold,rp_data[0]['percentage'] / 100)
+    X_expand = np.expand_dims(X,axis=3)
+
+    all_feature = fit_autoencoder(X_expand,rp_data[0]['image_size'],ae_data[0]['dimension_feature'],ae_data[0]['optimizer'],(3e-7) * (10**ae_data[0]['learning_rate']),ae_data[0]['activation_function'],ae_data[0]['loss_function'],ae_data[0]['batch_size'],ae_data[0]['epoch'])
+
+    cluster = dbscan(all_feature, eps=dbs_data[0]['epsilon'], min_samples=dbs_data[0]['min_sample'])
+    cluster_num = max(cluster.labels_) + 1
+    send_result_data(result, cluster_num, "RP Autoencoder & DBSCAN", cluster.labels_, all_feature)
     return []
 
 # gaf-ae-kmeans
@@ -709,10 +723,26 @@ def exct_gaf_autoencoder_hierarchy(n_clicks, gaf_data, ae_data, hrc_data):
     prevent_initial_call=True
 )
 def exct_gaf_autoencoder_dbscan(n_clicks, gaf_data, ae_data, dbs_data):
-    print(gaf_data)
-    print(ae_data)
-    print(dbs_data)
-    print("Time Series Resampler & Kmeans 중 입니다...")
+    print("GAF Autoencoder & DBSCAN 실행중입니다...")
+
+    # init
+    result, result_norm = initialize_data()
+
+    result_resample = exec_ts_resampler(result_norm, gaf_data[0]['image_size'])
+    #(242,28,1)
+    result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
+    #(242,28,28)
+    X = toGAFdata(tsdatas=result_,image_size=gaf_data[0]['image_size'], method=gaf_data[0]['gaf_method'])
+    X_expand = np.expand_dims(X,axis=3)
+
+    all_feature = fit_autoencoder(X_expand,gaf_data[0]['image_size'],ae_data[0]['dimension_feature'],ae_data[0]['optimizer'],(3e-7) * (10**ae_data[0]['learning_rate']),ae_data[0]['activation_function'],ae_data[0]['loss_function'],ae_data[0]['batch_size'],ae_data[0]['epoch'])
+
+    cluster = dbscan(all_feature, eps=dbs_data[0]['epsilon'], min_samples=dbs_data[0]['min_sample'])
+
+    cluster_num = max(cluster.labels_) + 1
+
+    send_result_data(result, cluster_num, "GAF Autoencoder & DBSCAN", cluster.labels_, all_feature)
+
     # init
     result, result_norm = initialize_data()
     return []
@@ -731,7 +761,7 @@ def exct_mtf_autoencoder_kmeans(n_clicks, mtf_data, ae_data, km_data):
     # init
     result, result_norm = initialize_data()
 
-    result_resample = exec_ts_resampler(result_nom, mtf_data[0]['image_size'])
+    result_resample = exec_ts_resampler(result_norm, mtf_data[0]['image_size'])
     #(242,28,1)
     result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
     #(242,28,28)
@@ -771,12 +801,24 @@ def exct_mtf_autoencoder_hierarchy(n_clicks, mtf_data, ae_data, hrc_data):
     prevent_initial_call=True
 )
 def exct_mtf_autoencoder_dbscan(n_clicks, mtf_data, ae_data, dbs_data):
-    print(mtf_data)
-    print(ae_data)
-    print(dbs_data)
-    print("Time Series Resampler & Kmeans 중 입니다...")
+    print("MTF Autoencoder & DBSCAN")
     # init
     result, result_norm = initialize_data()
+
+    result_resample = exec_ts_resampler(result_norm, mtf_data[0]['image_size'])
+    #(242,28,1)
+    result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
+    #(242,28,28)
+    X = toMTFdata(tsdatas=result_,image_size=mtf_data[0]['image_size'], n_bins=mtf_data[0]['n_bins'], strategy=mtf_data[0]['mtf_strategy'])
+    X_expand = np.expand_dims(X,axis=3)
+
+    all_feature = fit_autoencoder(X_expand,mtf_data[0]['image_size'],ae_data[0]['dimension_feature'],ae_data[0]['optimizer'],(3e-7) * (10**ae_data[0]['learning_rate']),ae_data[0]['activation_function'],ae_data[0]['loss_function'],ae_data[0]['batch_size'],ae_data[0]['epoch'])
+
+    cluster = dbscan(all_feature, eps=dbs_data[0]['epsilon'], min_samples=dbs_data[0]['min_sample'])
+
+    cluster_num = max(cluster.labels_) + 1
+
+    send_result_data(result, cluster_num, "MTF Autoencoder & DBSCAN", cluster.labels_, all_feature)
     return []
 # wavelet-kmeans
 @app.callback(

@@ -51,19 +51,30 @@ def pca_show(origin_data, labels, num_cluster):
     #     pca_ = pca.fit_transform(result_norm[i])
     #     result_pca.append(pca_)
     data = []
+    data_outlier = [[]]
     for i in range(num_cluster):
         data.append([])
     list_value = result_pca.tolist()
     for i in range(len(labels)):
-        data[labels[i]].append(list_value[i])
+        if labels[i] != -1:
+            data[labels[i]].append(list_value[i])
+        else:
+            data_outlier[0].append(list_value[i])
     #그래프 그리기
     fig = go.Figure()
     data_np = np.array(data, dtype=object)
+    data_outlier_np = np.array(data_outlier, dtype=object)
 
     for i in range(0,num_cluster):
         fig.add_trace(go.Scatter(
             x=[dt[0] for dt in data_np[i]], y= [dt[1] for dt in data_np[i]],
             mode='markers', name='Cluster'+str(i+1)
+            )
+        )
+    if data_outlier_np[0].shape[0] > 0 :
+        fig.add_trace(go.Scatter(
+            x=[dt[0] for dt in data_outlier_np[0]], y= [dt[1] for dt in data_outlier_np[0]],
+            mode='markers', name='Outlier'
             )
         )
     graph = html.Div(style={}, children=[
