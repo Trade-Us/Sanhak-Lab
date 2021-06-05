@@ -207,7 +207,7 @@ app.layout = html.Div(
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'),
-              prevent_initial_call=True 
+              prevent_initial_call=True
 )
 def update_output(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
@@ -331,7 +331,24 @@ def store_dbscan_param(eps, msp):
     df['min_sample'] = [msp]
     data = df.to_dict('records')
     return data
-
+# TimeSeriesKMeans 관련 parameter
+@app.callback(
+    Output('store-tskmeans-param', 'data'),
+    Input('number-of-cluster', 'value'),
+    Input('distance-algorithm', 'value'),
+    Input('try-n-barycenter', 'value'),
+    Input('metric-gamma', 'value'),
+    Input('try-n-init', 'value')
+)
+def store_tskmeans_para(noc, da, tnb, mg, tni):
+    df = pd.DataFrame()
+    df['number_of_cluster'] = [noc]
+    df['distance_algorithm'] = [da]
+    df['try_n_barycenter'] = [tnb]
+    df['metric_gamma'] = [mg]
+    df['try_n_init'] = [tni]
+    data = df.to_dict('records')
+    return data
 # Image Data(RP) 관련 Parameter
 @app.callback(
     Output('store-gaf-param', 'data'),
@@ -482,7 +499,7 @@ def set_normalize(origin_data_, normalize):
     State("partitioning-column-data", 'value'),
     State('main-ts-data', 'value'),
     State('normalization-method', 'value'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_ts_sample_kmeans(n_clicks, km_data, tsre_data, parti_columns, value, normalize):
     print("Time Series Resampler & Kmeans 중 입니다...")
@@ -492,8 +509,8 @@ def exct_ts_sample_kmeans(n_clicks, km_data, tsre_data, parti_columns, value, no
     df = df.loc[:,parti_columns + value_]
     result = split_into_values(df, parti_columns)
     min=result.dropna(axis='columns')
-    min_len = len(min.columns) if tsre_data[0]['dimension'] is None else tsre_data[0]['dimension']
     result_nom = set_normalize(result, normalize)
+    min_len = len(min.columns) if tsre_data[0]['dimension'] is None else tsre_data[0]['dimension']
     result_ = exec_ts_resampler(result_nom,min_len)
     result_ = result_.reshape(result_.shape[0],min_len)
 
@@ -510,7 +527,7 @@ def exct_ts_sample_kmeans(n_clicks, km_data, tsre_data, parti_columns, value, no
     State("partitioning-column-data", 'value'),
     State('main-ts-data', 'value'),
     State('normalization-method', 'value'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_ts_sample_hierarchy(n_clicks, hrc_data):
     print(hrc_data)
@@ -524,11 +541,36 @@ def exct_ts_sample_hierarchy(n_clicks, hrc_data):
     State("partitioning-column-data", 'value'),
     State('main-ts-data', 'value'),
     State('normalization-method', 'value'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_ts_sample_dbscan(n_clicks, dbs_data):
     print(dbs_data)
     return []
+# TimeSeriesSample + TimeSeriesKmeans
+@app.callback(
+    Output("hidden-ts-sample-ts-kmeans", "children"),
+    Input("learn-button", "n_clicks"),
+    State("store-tskmeans-param", 'data'),
+    State("store-ts-resampler-param", "data"),
+    State("partitioning-column-data", 'value'),
+    State('main-ts-data', 'value'),
+    State('normalization-method', 'value'),
+    prevent_initial_call=True
+)
+def exct_ts_sample_tskmeans(n_clikcs, tsk_data, tsre_data, parti_columns, value, normalize):
+    print("TimeSeriesResampler & TimeSeriesKMeans 실행중 입니다...")
+    df = pd.read_csv('.\\data\\saved_data.csv')
+    value_ = [value]
+    df = df.loc[:,parti_columns + value_]
+    result = split_into_values(df, parti_columns)
+    result_norm = set_normalize(result, normalize)
+
+    min_len = len(min.columns) if tsre_data[0]['dimension'] is None else tsre_data[0]['dimension']
+    result_ = exec_ts_resampler(result_norm,min_len)
+    cluster = ts_kmeans_clustering(result_, tsk_data[0]['number_of_cluster'], tsk_data[0]['try_n_init'], tsk_data[0]['distance_algorithm'])
+    send_result_data(result, tsk_data[0]['number_of_cluster'], "TimeSeriesResampler & TimeSeriesKMeans ", cluster.labels_, result_.reshape(result_.shape[0],min_len))
+
+
 # rp-ae-kmeans
 @app.callback(
     Output("hidden-rp-ae-kmeans", 'children'),
@@ -539,7 +581,7 @@ def exct_ts_sample_dbscan(n_clicks, dbs_data):
     State("partitioning-column-data", 'value'),
     State('main-ts-data', 'value'),
     State('normalization-method', 'value'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_columns, value, normalize):
     print("RP Autoencoder & Kmeans 실행중입니다...")
@@ -574,7 +616,7 @@ def exct_rp_autoencoder_kmeans(n_clicks, rp_data, ae_data, km_data,  parti_colum
     State("store-rp-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-hierarchy-param", 'data'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_rp_autoencoder_hierarchy(n_clicks, rp_data, ae_data, hrc_data):
     print(rp_data)
@@ -588,7 +630,7 @@ def exct_rp_autoencoder_hierarchy(n_clicks, rp_data, ae_data, hrc_data):
     State("store-rp-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-dbscan-param", 'data'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_rp_autoencoder_dbscan(n_clicks, rp_data, ae_data, dbs_data):
     print(rp_data)
@@ -603,12 +645,33 @@ def exct_rp_autoencoder_dbscan(n_clicks, rp_data, ae_data, dbs_data):
     State("store-gaf-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-kmeans-param", 'data'),
-    prevent_initial_call=True 
+    State("partitioning-column-data", 'value'),
+    State('main-ts-data', 'value'),
+    State('normalization-method', 'value'),
+    prevent_initial_call=True
 )
-def exct_gaf_autoencoder_kmeans(n_clicks, gaf_data, ae_data, km_data):
-    print(gaf_data)
-    print(ae_data)
-    print(km_data)
+def exct_gaf_autoencoder_kmeans(n_clicks, gaf_data, ae_data, km_data, parti_columns, value, normalize):
+    print("GAF Autoencoder & Kmeans 실행중입니다...")
+
+    df = pd.read_csv('.\\data\\saved_data.csv')
+    value_ = [value]
+    df = df.loc[:,parti_columns + value_]
+    result = split_into_values(df, parti_columns)
+    min=result.dropna(axis='columns')
+
+    result_nom = set_normalize(result, normalize)
+    result_resample = exec_ts_resampler(result_nom, gaf_data[0]['image_size'])
+    #(242,28,1)
+    result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
+    #(242,28,28)
+    X = toGAFdata(tsdatas=result_,image_size=gaf_data[0]['image_size'], method=gaf_data[0]['gaf_method'])
+    X_expand = np.expand_dims(X,axis=3)
+
+    all_feature = fit_autoencoder(X_expand,gaf_data[0]['image_size'],ae_data[0]['dimension_feature'],ae_data[0]['optimizer'],(3e-7) * (10**ae_data[0]['learning_rate']),ae_data[0]['activation_function'],ae_data[0]['loss_function'],ae_data[0]['batch_size'],ae_data[0]['epoch'])
+    print(f'feature shape{all_feature.shape}')
+    cluster = kmeans(all_feature, km_data[0]['number_of_cluster'] , km_data[0]['tolerance'], km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
+
+    send_result_data(result, km_data[0]['number_of_cluster'], "GAF Autoencoder & Kmeans", cluster.labels_, all_feature)
     return []
 # gaf-ae-hierarchy
 @app.callback(
@@ -617,7 +680,7 @@ def exct_gaf_autoencoder_kmeans(n_clicks, gaf_data, ae_data, km_data):
     State("store-gaf-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-hierarchy-param", 'data'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_gaf_autoencoder_hierarchy(n_clicks, gaf_data, ae_data, hrc_data):
     print(gaf_data)
@@ -631,7 +694,7 @@ def exct_gaf_autoencoder_hierarchy(n_clicks, gaf_data, ae_data, hrc_data):
     State("store-gaf-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-dbscan-param", 'data'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_gaf_autoencoder_dbscan(n_clicks, gaf_data, ae_data, dbs_data):
     print(gaf_data)
@@ -646,12 +709,32 @@ def exct_gaf_autoencoder_dbscan(n_clicks, gaf_data, ae_data, dbs_data):
     State("store-mtf-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-kmeans-param", 'data'),
-    prevent_initial_call=True 
+    State("partitioning-column-data", 'value'),
+    State('main-ts-data', 'value'),
+    State('normalization-method', 'value'),
+    prevent_initial_call=True
 )
-def exct_mtf_autoencoder_kmeans(n_clicks, mtf_data, ae_data, km_data):
-    print(mtf_data)
-    print(ae_data)
-    print(km_data)
+def exct_mtf_autoencoder_kmeans(n_clicks, mtf_data, ae_data, km_data, parti_columns, value, normalize):
+    print("MTF Autoencoder & Kmeans")
+    df = pd.read_csv('.\\data\\saved_data.csv')
+    value_ = [value]
+    df = df.loc[:,parti_columns + value_]
+    result = split_into_values(df, parti_columns)
+    min=result.dropna(axis='columns')
+
+    result_nom = set_normalize(result, normalize)
+    result_resample = exec_ts_resampler(result_nom, mtf_data[0]['image_size'])
+    #(242,28,1)
+    result_ = result_resample.reshape(result_resample.shape[0],1,result_resample.shape[1])
+    #(242,28,28)
+    X = toMTFdata(tsdatas=result_,image_size=mtf_data[0]['image_size'], n_bins=mtf_data[0]['n_bins'], strategy=mtf_data[0]['mtf_strategy'])
+    X_expand = np.expand_dims(X,axis=3)
+
+    all_feature = fit_autoencoder(X_expand,mtf_data[0]['image_size'],ae_data[0]['dimension_feature'],ae_data[0]['optimizer'],(3e-7) * (10**ae_data[0]['learning_rate']),ae_data[0]['activation_function'],ae_data[0]['loss_function'],ae_data[0]['batch_size'],ae_data[0]['epoch'])
+    print(f'feature shape{all_feature.shape}')
+    cluster = kmeans(all_feature, km_data[0]['number_of_cluster'] , km_data[0]['tolerance'], km_data[0]['try_n_init'], km_data[0]['try_n_kmeans'])
+
+    send_result_data(result, km_data[0]['number_of_cluster'], "MTF Autoencoder & Kmeans", cluster.labels_, all_feature)
     return []
 # mtf-ae-hierarchy
 @app.callback(
@@ -660,7 +743,7 @@ def exct_mtf_autoencoder_kmeans(n_clicks, mtf_data, ae_data, km_data):
     State("store-mtf-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-hierarchy-param", 'data'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_mtf_autoencoder_hierarchy(n_clicks, mtf_data, ae_data, hrc_data):
     print(mtf_data)
@@ -674,7 +757,7 @@ def exct_mtf_autoencoder_hierarchy(n_clicks, mtf_data, ae_data, hrc_data):
     State("store-mtf-param", 'data'),
     State("store-autoencoder-param", 'data'),
     State("store-dbscan-param", 'data'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_mtf_autoencoder_dbscan(n_clicks, mtf_data, ae_data, dbs_data):
     print(mtf_data)
@@ -687,7 +770,7 @@ def exct_mtf_autoencoder_dbscan(n_clicks, mtf_data, ae_data, dbs_data):
     Input("learn-button", "n_clicks"),
     State("store-wavelet-param", 'data'),
     State("store-kmeans-param", 'data'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_wavelet_kmeans(n_clicks, wav_data, kms_data):
     print(wav_data)
@@ -699,7 +782,7 @@ def exct_wavelet_kmeans(n_clicks, wav_data, kms_data):
     Input("learn-button", "n_clicks"),
     State("store-wavelet-param", 'data'),
     State("store-hierarchy-param", 'data'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_wavelet_hierarchy(n_clicks, wav_data, hrc_data):
     print(wav_data)
@@ -711,7 +794,7 @@ def exct_wavelet_hierarchy(n_clicks, wav_data, hrc_data):
     Input("learn-button", "n_clicks"),
     State("store-wavelet-param", 'data'),
     State("store-dbscan-param", 'data'),
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def exct_wavelet_dbscan(n_clicks, wav_data, dbs_data):
     print(wav_data)
@@ -725,7 +808,7 @@ import time
     Output("detail-graph-option", 'children'),
     Input("learn-button", "n_clicks"),
     # input
-    prevent_initial_call=True 
+    prevent_initial_call=True
 )
 def show_result1(change):
 

@@ -8,7 +8,7 @@ def rp_layout():
         html.H4("RP Parameters"),
         html.H6("Image Size"),
         html.Label("생성할 이미지 크기 결정"),
-        dcc.RadioItems(id='image-size', 
+        dcc.RadioItems(id='image-size',
             options=[
                 {'label': '28', 'value': 28},
                 {'label': '96', 'value': 96},
@@ -41,7 +41,7 @@ def gaf_layout():
         html.H4("GAF Parameters"),
         html.H6("Image Size"),
         html.Label("생성할 이미지 크기 결정"),
-        dcc.RadioItems(id='image-size', 
+        dcc.RadioItems(id='image-size',
             options=[
                 {'label': '28', 'value': 28},
                 {'label': '96', 'value': 96},
@@ -50,19 +50,19 @@ def gaf_layout():
         html.Label("GAF Summation vs GAF Difference"),
         dcc.Dropdown(id='gaf-method',
             options=[
-                {'label': 'summation', 'value':'SUM'},
-                {'label': 'difference', 'value':'DIF'}
-            ], value='SUM'),
+                {'label': 'summation', 'value':'s'},
+                {'label': 'difference', 'value':'d'}
+            ], value='s'),
         html.Hr()
     ])
-    
+
 def mtf_layout():
     return html.Div(id='mtf-param', children=[
         dcc.Store(id='store-mtf-param', data=[]),
         html.H4("MTF Parameters"),
         html.H6("Image Size"),
         html.Label("생성할 이미지 크기 결정"),
-        dcc.RadioItems(id='image-size', 
+        dcc.RadioItems(id='image-size',
             options=[
                 {'label': '28', 'value': 28},
                 {'label': '96', 'value': 96},
@@ -73,9 +73,9 @@ def mtf_layout():
         html.Label("Strategy"),
         dcc.Dropdown(id='mtf-strategy',
             options=[
-                {'label': 'quantile', 'value':'QUN'},
-                {'label': 'uniform', 'value':'UNI'},
-                {'label': 'normal', 'value':'NOR'}
-            ], value='QUN'),
+                {'label': 'quantile', 'value':'quantile'},
+                {'label': 'uniform', 'value':'uniform'},
+                {'label': 'normal', 'value':'normal'}
+            ], value='quantile'),
         html.Hr()
     ])

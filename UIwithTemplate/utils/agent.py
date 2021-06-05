@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import os
 from sklearn.model_selection import train_test_split
 import os, re, glob
-import cv2
 import numpy as np
 from utils.model import CNNAutoEncoder_28, CNNAutoEncoder_96, MakeAutoencoderModel
 from PIL import Image
@@ -20,7 +19,7 @@ class Autoencoder_Agent(object):
         if self.model_size == 28:
             self.model = CNNAutoEncoder_28(optimizer = optimizer, dimension=dimension, learning_rate = learning_rate, activation=activation_function, loss=loss_function)
             self.compressed_layer = 5
-        elif self.model_size == 96: 
+        elif self.model_size == 96:
             self.model = CNNAutoEncoder_96(optimizer = optimizer,dimension=dimension,
                                            learning_rate = learning_rate, activation=activation_function, loss=loss_function)
             self.compressed_layer = 8
